@@ -23,3 +23,5 @@
 
 启动命令推荐： gunicon
 nohup python3 -m gunicorn --worker-class eventlet -w 1 -b 127.0.0.1:5211 app:app > output.log 2>&1 &
+
+**本项目使用登录功能为muvocal auth sso单点登录，可以联系管理员，或者修改使用自主登录功能，如不使用sso，请修改数据库用户表，该表内无密码字段**
