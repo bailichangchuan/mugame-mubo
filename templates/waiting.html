@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}等待中 - 房间 {{ room.id }}{% endblock %}
+
+{% block content %}
+<div style="margin-top: 100px;">
+    <h2>房间号: <span style="color: red; font-size: 32px;">{{ room.id }}</span></h2>
+    <p>房主 (红方): {{ p1_name }}</p>
+    <hr style="width: 50%;">
+    
+    <div id="wait-area">
+        <h3>⏳ 等待对手加入...</h3>
+        <p>请将房间号告诉你的朋友</p>
+        <div class="loader"></div> </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const roomId = {{ room.id }};
+    
+    // 建立连接
+    socket.emit('connect_to_room', {room_id: roomId});
+
+    // 监听：如果有人加入，服务器广播 'player_joined_event'
+    socket.on('player_joined_event', (data) => {
+        if (data.room_id == roomId) {
+            alert("对手已加入，游戏开始！");
+            // 刷新页面 -> 服务器发现状态变为 playing -> 渲染 game.html
+            window.location.reload(); 
+        }
+    });
+</script>
+{% endblock %}

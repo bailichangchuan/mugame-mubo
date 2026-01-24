@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}游戏结束 - 房间 {{ room_id }}{% endblock %}
+
+{% block content %}
+<div class="result-container" style="margin-top: 100px;">
+    <h1 style="font-size: 48px; color: #d32f2f; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+        🏆 游戏结束 🏆
+    </h1>
+
+    <div style="margin: 40px 0; padding: 30px; background: #fff8e1; border: 2px solid #8b4513; border-radius: 10px; display: inline-block;">
+        <h2 style="color: #333;">获胜方</h2>
+        
+        {% if winner_side == 'R' %}
+            <div style="font-size: 36px; color: #e74c3c; font-weight: bold;">
+                🔴 红方 ({{ winner_name }})
+            </div>
+        {% elif winner_side == 'B' %}
+            <div style="font-size: 36px; color: #34495e; font-weight: bold;">
+                ⚫ 黑方 ({{ winner_name }})
+            </div>
+        {% else %}
+            <div style="font-size: 36px; color: gray;">
+                平局 或 异常结束
+            </div>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 30px;">
+        <a href="/game/bo/" style="text-decoration: none;">
+            <button style="padding: 15px 40px; font-size: 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                🏠 返回大厅
+            </button>
+        </a>
+    </div>
+</div>
+{% endblock %}

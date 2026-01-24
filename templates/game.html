@@ -1,0 +1,644 @@
+{% extends "base.html" %}
+
+{% block title %}对战中 - 房间 {{ room.id }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- Responsive Variables --- */
+    :root {
+        --cell-size: 60px;   /* Default desktop size */
+        --piece-size: 50px;  /* Default piece size */
+        --font-size: 16px;
+    }
+
+    /* --- Container Layout --- */
+    .container {
+        display: flex;
+        flex-direction: row;       /* Desktop: Side-by-Side */
+        justify-content: center;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 10px;
+        flex-wrap: wrap;           /* Allow wrapping if screen is weirdly small */
+    }
+
+    /* --- The Board --- */
+    #game-board {
+        display: grid;
+        /* Use variable for size */
+        grid-template-columns: repeat(9, var(--cell-size));
+        grid-template-rows: repeat(9, var(--cell-size));
+        background-color: #deb887;
+        border: 5px solid #8b4513;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        margin: 0 auto; /* Center itself */
+    }
+
+    .cell { 
+        width: var(--cell-size); 
+        height: var(--cell-size); 
+        border: 1px solid #a0522d; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        cursor: pointer; 
+        box-sizing: border-box; /* Important for borders */
+    }
+
+    .river { background-color: #87ceeb; opacity: 0.3; }
+
+    /* --- The Pieces --- */
+    .piece { 
+        width: var(--piece-size); 
+        height: var(--piece-size); 
+        border-radius: 50%; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        color: white; 
+        font-weight: bold; 
+        font-size: var(--font-size);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        transition: transform 0.1s;
+    }
+    .side-R { background-color: #e74c3c; border: 2px solid #c0392b; }
+    .side-B { background-color: #34495e; border: 2px solid #2c3e50; }
+    .selected { box-shadow: 0 0 10px 5px yellow; z-index: 10; transform: scale(1.1); }
+
+    /* --- The Sidebar (Extension Area) --- */
+    .game-sidebar {
+        width: 250px; 
+        text-align: left; 
+        padding: 15px; 
+        background: white; 
+        border: 1px solid #ccc; 
+        display: flex; 
+        flex-direction: column;
+        border-radius: 8px;
+    }
+
+    /* --- Mobile Adaptation (Screens smaller than 768px) --- */
+    @media (max-width: 768px) {
+        :root {
+            /* 100vw / 9 columns = ~11vw. We use 10.5vw to leave room for borders */
+            --cell-size: 10.5vw; 
+            --piece-size: 8vw;
+            --font-size: 12px;
+        }
+
+        .container {
+            flex-direction: column; /* Stack vertically */
+            align-items: center;    /* Center everything */
+            padding: 5px;
+        }
+
+        .game-sidebar {
+            width: 100%;            /* Sidebar takes full width */
+            max-width: 95vw;        /* Prevent overflow */
+            margin-top: 15px;       /* Add space between board and sidebar */
+            order: 2;               /* Ensure it stays below board */
+        }
+        
+        #game-board {
+            order: 1;               /* Ensure board is on top */
+        }
+    }
+
+    /* --- Existing Card & Modal Styles (Keep these) --- */
+    .card-container { display: flex; flex-wrap: wrap; gap: 8px; }
+    .strategy-card {
+        position: relative; width: 45px; height: 60px;
+        background: linear-gradient(to bottom, #f9f9f9, #e0e0e0);
+        border: 1px solid #999; border-radius: 4px; cursor: pointer;
+        display: flex; justify-content: center; align-items: center;
+        font-size: 12px; text-align: center; transition: all 0.2s; user-select: none;
+    }
+    .strategy-card:hover { transform: translateY(-2px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .strategy-card.active { background: #fffacd; border: 2px solid #ff9800; box-shadow: 0 0 8px rgba(255, 152, 0, 0.6); }
+    .strategy-card.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(100%); }
+    .card-count {
+        position: absolute; top: -5px; right: -5px; background-color: #d32f2f;
+        color: white; font-size: 10px; width: 16px; height: 16px;
+        border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid white;
+    }
+    .card-text { writing-mode: vertical-lr; letter-spacing: 2px; font-weight: bold; color: #333; }
+    
+    /* Modals */
+    #combat-modal {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.95); color: white; padding: 30px; 
+        border: 4px solid gold; border-radius: 10px; display: none; z-index: 3000;
+        min-width: 300px; /* Reduced min-width for mobile */
+        width: 90%;       /* Responsive width */
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+    }
+    #duel-interaction {
+         width: 90%; max-width: 400px; /* Responsive width */
+    }
+</style>
+{% endblock %}
+{% block content %}
+    <div id="combat-modal" style="display:none;">
+        <h2 id="combat-result" style="text-align:center; margin-bottom:20px;"></h2>
+        <div id="combat-details"></div>
+    </div>
+
+    <div id="duel-interaction" style="display:none; position:fixed; top:40%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.95); padding:30px; border:3px solid red; border-radius:10px; color:white; z-index:2000; text-align:center; box-shadow: 0 0 20px rgba(255,0,0,0.5);">
+        <h2 style="color: gold; margin-top:0;">⚔️ 决斗阶段 ⚔️</h2>
+        <p style="color:#ddd;">双方决斗比拼...</p>
+        
+        <div style="display:flex; justify-content:space-between; width:350px; margin:20px auto; background:rgba(255,255,255,0.1); padding:10px; border-radius:5px;">
+            <div style="text-align:center; width:45%;">
+                <p style="margin:5px 0; color:#e74c3c; font-weight:bold;">进攻方</p>
+                <span id="duel-status-atk" style="font-size:14px;">⏳ 等待中</span>
+            </div>
+            <div style="display:flex; align-items:center; font-weight:bold; color:gold;">VS</div>
+            <div style="text-align:center; width:45%;">
+                <p style="margin:5px 0; color:#3498db; font-weight:bold;">防守方</p>
+                <span id="duel-status-def" style="font-size:14px;">⏳ 等待中</span>
+            </div>
+        </div>
+    
+        <button id="btn-duel-roll" onclick="rollCombat()" style="padding:15px 40px; font-size:18px; background:linear-gradient(to bottom, #e74c3c, #c0392b); color:white; border:2px solid #ffcc00; border-radius:5px; cursor:pointer; font-weight:bold; transition:all 0.2s;">
+            🗡️ 点击运功 (抽签)
+        </button>
+        <p id="duel-msg" style="margin-top:15px; color:yellow; font-size:14px; min-height:20px;"></p>
+    </div>
+
+    <h1>房间: {{ room.id }}</h1>
+    <p>红方: {{ p1_name }} vs 黑方: {{ p2_name }}</p>
+
+     <div class="container">
+        <div id="game-board"></div>
+    
+        <div class="game-sidebar">
+            
+            <p>当前回合: <strong id="disp-turn"></strong></p>
+            <p>剩余步数: <span id="disp-steps" style="font-size:24px; color:red;">0</span></p>
+            
+            <button id="btn-roll" onclick="rollForTurn()" disabled>🎲 掷采</button>
+            <button onclick="endTurnManual()">结束回合</button>
+            
+            <div id="log-area" style="height: 150px; overflow-y: auto; font-size: 12px; margin-top: 10px; border-top: 1px solid #ccc;"></div>
+    
+            <div id="card-area" style="margin-top: 15px; border-top: 2px dashed #eee; padding-top: 10px;">
+                <p style="font-size:14px; font-weight:bold; color:#333;">🎴 策略锦囊</p>
+                <div class="card-container" style="display: flex; flex-wrap: wrap; gap: 5px;"></div>
+            </div>
+        </div>
+     </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // --- 坐标转换算法 ---
+    // 输入：视觉上的行列 (0-8)
+    // 输出：后端数据里的真实行列 (0-8)
+    // 数学原理：x' = 8 - x 是互逆的，所以 ViewToReal 和 RealToView 是同一个公式
+    function transformCoord(r, c) {
+        // 如果我是黑方，我看 (0,0) 其实是数据的 (8,8)
+        if (mySide === 'B') {
+            return { r: 8 - r, c: 8 - c };
+        }
+        // 如果我是红方或旁观者，不做转换
+        return { r: r, c: c };
+    }
+    // 定义一个字典
+    const pieceNames = {
+        'X': '枭',
+        'T': '矢',
+        'S': '散'
+    };
+
+    // 在 script 标签顶部附近，补充定义：
+    const roomId = {{ room.id }};
+    const myUserId = {{ user.id }};
+    
+    // --- 新增：保存玩家信息，用于显示名字 ---
+    const p1Id = {{ room.player1_id }}; // 红方ID
+    const p2Id = {{ room.player2_id }}; // 黑方ID
+    const p1Name = "{{ p1_name }}";     // 红方名字
+    const p2Name = "{{ p2_name }}";     // 黑方名字
+    const roomPlayer1Id = p1Id;
+    const roomPlayer2Id = p2Id;
+    
+
+    let mySide = '{{ "R" if user.id == room.player1_id else "B" }}';
+    if ({{ "true" if user.id != room.player1_id and user.id != room.player2_id else "false" }}) {
+        mySide = 'Spectator';
+    }
+
+    let globalBoardState = [];
+    let selectedPiece = null;
+
+    // 初始化连接
+    socket.emit('connect_to_room', {room_id: roomId});
+    
+    // 首次渲染 (利用 Jinja 传入的初始状态，或者等待 socket 更新)
+    // 为了保险，我们请求一次更新
+    socket.emit('request_update', {room_id: roomId}); // 需在后端加个空事件或者依赖后续广播
+
+    // --- Socket 监听 (逻辑同之前) ---
+    
+    socket.on('roll_result', (data) => {
+        addLog(`🎲 [${data.sticks}] -> ${data.steps}步`);
+    });
+
+    // templates/game.html 中的 script 部分
+    socket.on('board_update', (data) => {
+        renderBoard(data.state.board);
+        updateInfo(data.state);
+        
+        if(data.combat) {
+            showCombatModal(data.combat);
+        }
+
+        // --- 新增：检测游戏结束并跳转 ---
+        if (data.state.winner) {
+            // 禁用所有操作
+            document.getElementById('btn-roll').disabled = true;
+            
+            // 延迟 1.5秒 跳转，让玩家看清最后的结果
+            setTimeout(() => {
+                window.location.href = `/game/bo/result/${roomId}`;
+            }, 1500);
+        }
+    });
+
+    socket.on('error', (data) => alert(data.msg));
+
+    // --- 核心操作函数 ---
+    
+    function rollForTurn() { socket.emit('roll_for_turn', {room_id: roomId}); }
+    function endTurnManual() { socket.emit('end_turn_manually', {room_id: roomId}); }
+    
+    function transformCoord(viewR, viewC) {
+        // HTML格子的 0 是顶部，8 是底部。
+        
+        if (mySide === 'R') {
+            // 我是红方(数据在0-3)。
+            // 我希望数据0显示在底部(视觉8)。
+            // 所以 View(8) -> Real(0)。
+            // 算法：翻转
+            return { r: 8 - viewR, c: 8 - viewC };
+        } 
+        else if (mySide === 'B') {
+            // 我是黑方(数据在5-8)。
+            // 我希望数据8显示在底部(视觉8)。
+            // 所以 View(8) -> Real(8)。
+            // 算法：不翻转
+            return { r: viewR, c: viewC };
+        }
+        
+        // 旁观者默认视角（通常红方在下，即翻转）
+        return { r: 8 - viewR, c: 8 - viewC };
+    }
+
+    function renderBoard(boardData) {
+        globalBoardState = boardData; // 存下来用于重绘
+        const boardContainer = document.getElementById('game-board');
+        boardContainer.innerHTML = ''; 
+
+        if (!boardData) return;
+
+        // 这里的 r, c 是【视觉坐标】：
+        // r=0 是屏幕最上方，r=8 是屏幕最下方
+        // 我们希望玩家把自己视为在“下方”，所以通常棋盘渲染是从上到下(0->8)
+        // 但在这一题里，我们希望“我方”永远在下面。
+        // 所以我们还是按标准生成 0-8 的 div，但是填内容的时候去取反。
+
+        for (let viewR = 0; viewR < 9; viewR++) {
+            for (let viewC = 0; viewC < 9; viewC++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                
+                // 楚河汉界处理：视觉上永远在中间
+                if (viewR === 4) cell.classList.add('river');
+
+                // --- 核心修改点 ---
+                // 使用算法计算出这个格子对应的【真实数据坐标】
+                const real = transformCoord(viewR, viewC);
+                const piece = boardData[real.r][real.c];
+
+                // 渲染棋子
+                if (piece) {
+                    const pDiv = document.createElement('div');
+                    pDiv.className = `piece side-${piece.side}`;
+                    // 直接取值，取不到默认为'散'
+                    pDiv.innerText = pieceNames[piece.type] || '散';
+                    
+                    // if (piece.type === 'T') {
+                    //     pDiv.innerHTML = "🏹"; // 直接换成弓箭图标
+                    // }
+
+                    // 高亮处理：注意 selectedPiece 存的是【真实坐标】，所以要对比 real
+                    if (selectedPiece && selectedPiece.r === real.r && selectedPiece.c === real.c) {
+                        pDiv.classList.add('selected');
+                    }
+                    
+                    cell.appendChild(pDiv);
+                }
+                
+                // 点击事件：传入视觉坐标，或者直接在处理函数里转
+                // 这里我们传入视觉坐标，在 handleCellClick 里统一处理
+                cell.onclick = () => handleCellClick(viewR, viewC);
+                
+                boardContainer.appendChild(cell);
+            }
+        }
+    }
+
+    function handleCellClick(viewR, viewC) {
+        const state = getCurrentState();
+        // 1. 只有轮到自己才能动
+        if (state.turn !== myUserId) return;
+
+        // 2. 将点击的【视觉坐标】转换为【真实坐标】
+        const real = transformCoord(viewR, viewC);
+        
+        // 从缓存的棋盘数据中获取真实的棋子对象
+        const piece = globalBoardState[real.r][real.c];
+
+        // --- 以下逻辑使用 real.r 和 real.c ---
+
+        // 拦截：如果在决斗中，禁止移动棋子
+        if (state.pending_combat && state.pending_combat.active) {
+            alert("正在决斗阶段，请先完成抽签！");
+            return;
+        }
+
+        if (!selectedPiece) {
+            // 选中逻辑
+            if (piece && piece.side === mySide) {
+                selectedPiece = { r: real.r, c: real.c }; // 存入真实坐标
+                renderBoard(globalBoardState); // 重绘以显示高亮
+            }
+        } else {
+            // 取消选中
+            if (selectedPiece.r === real.r && selectedPiece.c === real.c) {
+                selectedPiece = null;
+                renderBoard(globalBoardState);
+                return;
+            }
+            // 切换选中己方其他棋子
+            if (piece && piece.side === mySide) {
+                selectedPiece = { r: real.r, c: real.c };
+                renderBoard(globalBoardState);
+                return;
+            }
+            
+            // 移动/攻击逻辑
+            // 发送给后端的必须是【真实坐标】
+            socket.emit('move_piece', {
+                room_id: roomId,
+                from_r: selectedPiece.r, 
+                from_c: selectedPiece.c,
+                to_r: real.r,    // 目标真实行
+                to_c: real.c     // 目标真实列
+            });
+            selectedPiece = null;
+        }
+    }
+
+    function updateInfo(state) {
+        window.currentState = state; // 更新全局状态
+        
+        // --- 1. 更新剩余步数 ---
+        const stepsSpan = document.getElementById('disp-steps');
+        stepsSpan.innerText = state.steps_left;
+
+        // --- 2. 更新当前回合显示 (ID 转 名字) ---
+        const turnDisplay = document.getElementById('disp-turn');
+        if (state.turn === p1Id) {
+            turnDisplay.innerText = `🔴 红方 (${p1Name})`;
+            turnDisplay.style.color = "#e74c3c";
+        } else if (state.turn === p2Id) {
+            turnDisplay.innerText = `⚫ 黑方 (${p2Name})`;
+            turnDisplay.style.color = "#34495e";
+        } else {
+            turnDisplay.innerText = "未知";
+        }
+
+        // --- 3. 控制“掷采”按钮状态 ---
+        const rollBtn = document.getElementById('btn-roll');
+        
+        // 启用条件：是我的回合 && 我还没掷过骰子 && 没有正在进行的决斗
+        const isMyTurn = (state.turn === myUserId);
+        const hasRolled = state.has_rolled;
+        const isCombat = state.pending_combat && state.pending_combat.active;
+
+        if (isMyTurn && !hasRolled && !isCombat) {
+            rollBtn.disabled = false;
+            rollBtn.innerText = "🎲 掷采 (你的回合)";
+            rollBtn.style.cursor = "pointer";
+            rollBtn.style.opacity = "1";
+        } else {
+            rollBtn.disabled = true;
+            if (!isMyTurn) {
+                rollBtn.innerText = "等待对手...";
+            } else if (hasRolled) {
+                rollBtn.innerText = "已掷采，请移动";
+            }
+            rollBtn.style.cursor = "not-allowed";
+            rollBtn.style.opacity = "0.6";
+        }
+
+        // --- 4. 决斗状态检测 (保留你之前的代码) ---
+        const duelDiv = document.getElementById('duel-interaction');
+        const combat = state.pending_combat;
+
+        if (combat && combat.active) {
+            duelDiv.style.display = 'block';
+            
+            const atkStatus = combat.attacker.has_rolled ? "✅ 已就绪" : "⏳ 思考中...";
+            const defStatus = combat.defender.has_rolled ? "✅ 已就绪" : "⏳ 思考中...";
+            document.getElementById('duel-status-atk').innerText = atkStatus;
+            document.getElementById('duel-status-def').innerText = defStatus;
+            
+            const btn = document.getElementById('btn-duel-roll');
+            const myRole = (mySide === combat.attacker.side) ? 'attacker' : 
+                           (mySide === combat.defender.side) ? 'defender' : 'spectator';
+            
+            if (myRole === 'spectator') {
+                btn.style.display = 'none';
+                document.getElementById('duel-msg').innerText = "正在观战决斗...";
+            } else {
+                btn.style.display = 'inline-block';
+                if (combat[myRole].has_rolled) {
+                    btn.disabled = true;
+                    btn.innerText = "已运功，等待对手...";
+                    btn.style.background = "#555";
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = "🗡️ 决斗抽签";
+                    btn.style.background = "red";
+                }
+            }
+        } else {
+            duelDiv.style.display = 'none';
+        }
+    }
+    // 新增：发送决斗请求
+    function rollCombat() {
+        console.log('发送决斗抽签请求，房间ID:', roomId);
+        socket.emit('combat_roll', { room_id: roomId });
+        document.getElementById('duel-msg').textContent = '正在抽签，请稍候...';
+    }
+    
+    // 获取当前状态的辅助函数
+    function getCurrentState() { return window.currentState || {}; }
+
+    function showCombatModal(combat) {
+        const modal = document.getElementById('combat-modal'); // 确保你有这个弹窗div
+        const details = document.getElementById('combat-details');
+        const resultTitle = document.getElementById('combat-result');
+
+        // 格式化显示的辅助函数
+        const formatPower = (info) => {
+            let html = `<span style="font-size:24px;">${info.val}</span>`;
+            if (info.multiplier > 1.0) {
+                html += ` <span style="color:gold; font-size:16px;">× ${info.multiplier} (枭)</span>`;
+            }
+            html += ` = <strong style="font-size:30px; color:${info.side==='R'?'red':'#aaf'}">${info.final_power}</strong>`;
+            return html;
+        };
+
+        const atkHtml = formatPower(combat.attacker);
+        const defHtml = formatPower(combat.defender);
+
+        details.innerHTML = `
+            <div style="display:flex; justify-content:space-around; align-items:center;">
+                <div style="text-align:center;">
+                    <h3>进攻方</h3>
+                    ${atkHtml}
+                </div>
+                <div style="font-size:30px; font-weight:bold;">VS</div>
+                <div style="text-align:center;">
+                    <h3>防守方</h3>
+                    ${defHtml}
+                </div>
+            </div>
+            <p style="text-align:center; margin-top:20px; color:#ccc;">${combat.msg}</p>
+        `;
+
+        if (combat.winner === 'attacker') {
+            resultTitle.innerText = "⚔️ 进攻成功 ⚔️";
+            resultTitle.style.color = "#4CAF50"; // 绿色
+        } else {
+            resultTitle.innerText = "🛡️ 防守反杀 🛡️";
+            resultTitle.style.color = "#f44336"; // 红色
+        }
+
+        modal.style.display = 'block';
+        
+        // 3秒后自动关闭
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 3500);
+    }
+    
+    function addLog(msg) {
+        const d = document.createElement('div');
+        d.innerText = msg;
+        document.getElementById('log-area').prepend(d);
+    }
+    // game.html -> script
+
+    // 定义卡牌元数据 (用于前端显示名称)
+    const CARD_META = {
+        'card_1': { name: '二位一', color: '#aed581' },
+        'card_2': { name: '首位一', color: '#4db6ac' },
+        'card_3': { name: '双星照', color: '#ba68c8' }, // 紫色代表稀有
+        'card_4': { name: '三阳泰', color: '#ffb74d' }  // 金色代表传说
+    };
+
+    // 监听状态更新
+    // 在 Socket.IO 初始化后添加
+    console.log('Socket.IO 连接状态:', socket.connected);
+    
+    // 监听错误事件
+    socket.on('error', function(data) {
+        console.error('Socket.IO 错误:', data);
+        document.getElementById('duel-msg').textContent = '错误: ' + data.msg;
+    });
+    
+    // 监听状态更新
+    // 监听状态更新
+    socket.on('board_update', function(data) {
+        console.log('收到状态更新:', data);
+        window.currentState = data.state;
+        updateInfo(data.state); // 修正：使用 updateInfo 而不是未定义的 updateGameState
+        renderCards(data.state); // 新增：渲染卡片
+        if (data.combat) {
+            showCombatModal(data.combat);
+        }
+    });
+
+    function renderCards(state) {
+        const container = document.querySelector('.card-container');
+        container.innerHTML = ''; 
+
+        if (!state.cards) return;
+
+        // 基础变量
+        const myUserId = "{{ current_user.id }}";
+        const roomPlayer1Id = "{{ room.player1_id }}";
+        const myCards = state.cards[myUserId] || {}; 
+        const mySide = (String(myUserId) === String(roomPlayer1Id)) ? 'R' : 'B';
+        
+        // 获取我的激活卡牌
+        const activeCardsMap = state.active_cards || {};
+        const myActiveCard = activeCardsMap[myUserId];
+
+        // --- 【核心修改】判断是否允许点击 ---
+        let canClick = false;
+        
+        // 只有在战斗中 (pending_combat) 才能用卡
+        const combat = state.pending_combat;
+        if (combat && combat.active) {
+            // 判断我在战斗中的角色
+            let myRoleInCombat = null;
+            if (combat.attacker.side === mySide) myRoleInCombat = 'attacker';
+            else if (combat.defender.side === mySide) myRoleInCombat = 'defender';
+            
+            // 如果我是当事人，且我还没有掷采，就可以用卡
+            if (myRoleInCombat && !combat[myRoleInCombat].has_rolled) {
+                canClick = true;
+            }
+        }
+
+        // 渲染卡牌
+        Object.keys(CARD_META).forEach(cardType => {
+            const meta = CARD_META[cardType];
+            const count = myCards[cardType] || 0;
+
+            if (count > 0) {
+                const cardElement = document.createElement('div');
+                // 样式：激活高亮
+                cardElement.className = `strategy-card ${myActiveCard === cardType ? 'active' : ''}`;
+                cardElement.style.borderBottom = `3px solid ${meta.color}`;
+                
+                cardElement.innerHTML = `
+                    <div class="card-count">${count}</div>
+                    <div class="card-text">${meta.name}</div>
+                `;
+
+                // 绑定事件
+                if (canClick) {
+                    cardElement.onclick = function() {
+                        socket.emit('select_card', { 
+                            room_id: roomId, 
+                            card_type: cardType 
+                        });
+                    };
+                } else {
+                    // 如果不能点，加禁用样式
+                    cardElement.classList.add('disabled');
+                }
+
+                container.appendChild(cardElement);
+            }
+        });
+    }
+</script>
+{% endblock %}
