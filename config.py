@@ -20,6 +20,9 @@ class Config:
         'card_3': {'name': '双星高照', 'limit': 3, 'desc': '前2位必为1'}, # 稀有
         'card_4': {'name': '三阳开泰', 'limit': 2, 'desc': '前3位必为1'}  # 传说 
     }
+    #图片配置
+    RED_PICTURE = "https://cdn.muvocal.com/up/2026/2/9/a0654f2b-a535-404e-a6f0-0f92c5f34b88.png"
+    BLACK_PICTURE = "https://cdn.muvocal.com/up/2026/2/9/265deb34-41ef-4f9f-8495-84af758646df.png"
 
 # 添加模块级别的变量
 CARD_CONFIG = Config.CARD_CONFIG

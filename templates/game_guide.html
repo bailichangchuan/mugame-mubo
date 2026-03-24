@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>穆博棋 · 游戏说明</title>
+    <style>
+        body {
+            font-family: 'KaiTi', serif;
+            background-color: #f0e6d2;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #3498db;
+            text-align: center;
+        }
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #2c3e50;
+            margin-top: 20px;
+        }
+        h4 {
+            color: #34495e;
+            margin-top: 15px;
+        }
+        p {
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+        ul, ol {
+            margin: 10px 0 10px 20px;
+        }
+        li {
+            margin: 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .nav-tabs {
+            display: flex;
+            border-bottom: 2px solid #3498db;
+            margin: 20px 0;
+        }
+        .nav-tab {
+            padding: 10px 20px;
+            margin-right: 5px;
+            border: none;
+            background: #95a5a6;
+            color: white;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .nav-tab.active {
+            background: #3498db;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .back-button {
+            display: inline-block;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .back-button:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 穆博棋 · 游戏说明</h1>
+        
+        <!-- 导航标签 -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('basic')">游戏基本信息</button>
+            <button class="nav-tab" onclick="showTab('pieces')">棋子信息</button>
+            <button class="nav-tab" onclick="showTab('terrain')">地形与高度</button>
+            <button class="nav-tab" onclick="showTab('combat')">战斗系统</button>
+            <button class="nav-tab" onclick="showTab('card')">锦囊系统</button>
+        </div>
+        
+        <!-- 内容区域 -->
+        <div class="tab-content active" id="basic">
+            <h2>游戏基本信息</h2>
+            <p>穆博棋是一款基于六博棋、中国象棋和战棋规则的创新对战游戏，融合了策略、运气和战术元素。</p>
+            <h3>游戏目标</h3>
+            <p>通过战斗和策略，击败对方的核心棋子（枭）。</p>
+            <h3>游戏流程</h3>
+            <ol>
+                <li>玩家创建或加入房间</li>
+                <li>游戏开始，红方先手</li>
+                <li>每回合玩家先掷采（掷骰子）决定步数</li>
+                <li>玩家使用步数移动棋子或攻击对方棋子</li>
+                <li>当一方的枭被击败时，游戏结束</li>
+            </ol>
+            <h3>回合规则</h3>
+            <ul>
+                <li>每回合玩家有一次掷采机会</li>
+                <li>掷采结果决定本回合可用步数</li>
+                <li>移动或攻击会消耗步数</li>
+                <li>步数用完或玩家主动结束回合，回合结束</li>
+            </ul>
+        </div>
+        
+        <div class="tab-content" id="pieces">
+            <h2>棋子信息</h2>
+            <h3>棋子类型</h3>
+            <table id="piece-types-table">
+                <tr>
+                    <th>棋子类型</th>
+                    <th>标识</th>
+                    <th>移动范围</th>
+                    <th>攻击范围</th>
+                    <th>攻击倍率</th>
+                    <th>防御倍率</th>
+                    <th>移动成本</th>
+                    <th>攻击连携</th>
+                    <th>防御连携</th>
+                    <th>连携范围</th>
+                    <th>特殊能力</th>
+                </tr>
+                <tr>
+                    <td colspan="11" style="text-align: center; padding: 20px;">加载中...</td>
+                </tr>
+            </table>
+            <h3>棋子属性</h3>
+            <ul>
+                <li><strong>move_range</strong>：移动范围，决定棋子每回合最多可以移动的格子数</li>
+                <li><strong>move_cost</strong>：移动成本，每移动一格消耗的步数</li>
+                <li><strong>combat_range</strong>：攻击范围，决定棋子可以攻击的最大距离</li>
+                <li><strong>base_power</strong>：攻击倍率，作为攻击方时的基础攻击力</li>
+                <li><strong>defense_power</strong>：防御倍率，作为防守方时的基础防御力</li>
+                <li><strong>attack_coop</strong>：攻击连携倍率，当己方棋子为进攻方触发连携攻击时的倍率</li>
+                <li><strong>defense_coop</strong>：防守连携倍率，当己方棋子为防守方触发连携攻击时的倍率</li>
+                <li><strong>coop_range</strong>：连携范围，决定连携攻击的有效范围</li>
+                <li><strong>terrain_change</strong>：地形修改能力，1表示可以修改地形高度</li>
+                <li><strong>远程攻击</strong>矢和炮可以进行远程攻击，最远距离通常为3。最佳倍率在攻击距离为2时触发；小于2时，攻击力倍率为base_power-0.4；大于2时，攻击力倍率为base_power-0.7。</li>
+            </ul>
+        </div>
+        
+        <div class="tab-content" id="terrain">
+            <h2>地形与高度</h2>
+            <h3>地形类型</h3>
+            <table>
+                <tr>
+                    <th>地形类型</th>
+                    <th>移动成本</th>
+                    <th>战斗加成</th>
+                    <th>描述</th>
+                </tr>
+                <tr>
+                    <td>平原</td>
+                    <td>1.0</td>
+                    <td>1.0</td>
+                    <td>基础地形，无特殊效果</td>
+                </tr>
+                <tr>
+                    <td>水域</td>
+                    <td>2.0</td>
+                    <td>0.8</td>
+                    <td>移动成本增加，战斗效果减弱</td>
+                </tr>
+                <tr>
+                    <td>山地</td>
+                    <td>2</td>
+                    <td>1.2</td>
+                    <td>移动成本增加，战斗效果增强</td>
+                </tr>
+                <tr>
+                    <td>城墙</td>
+                    <td>999</td>
+                    <td>0</td>
+                    <td>禁止移动上城墙</td>
+                </tr>
+            </table>
+            <h3>高度系统</h3>
+            <p>棋盘上每个格子都有高度值，高度会影响：</p>
+            <ul>
+                <li><strong>移动</strong>：相邻格子高度差超过1时，无法移动，向上移动时移动成本增加，向下移动时成本降低</li>
+                <li><strong>攻击</strong>：高处攻击低处时，攻击力会有加成</li>
+                <li><strong>远程攻击</strong>：高度差会影响远程攻击的最大范围,<br>其计算方式为：最远距离+（当前高度-目标高度）, 如矢在高度为2，目标高度为0，则最大范围为3+（2-0）=5。
+                其同时影响战斗力，如此时能够触发最大攻击力的范围为2~2+(当前高度-目标高度)，即2~4.</li>
+            </ul>
+            <p>高度值范围：-1（低洼）到 3（高山）</p>
+            <h3>地形修改</h3>
+            <p>工棋子可以修改地形高度，每次修改可以：</p>
+            <ul>
+                <li>增加1点高度</li>
+                <li>减少1点高度</li>
+            </ul>
+            <p>炮棋子攻击地面时可以修改地形高度，每次轰炸降低1地形高度</p>
+        </div>
+        
+        <div class="tab-content" id="combat">
+            <h2>战斗系统</h2>
+            <h3>战斗触发</h3>
+            <p>当一方棋子移动到另一方棋子所在的格子时，会触发战斗。</p>
+            <h3>战斗流程</h3>
+            <ol>
+                <li>双方掷采（生成6位二进制数）</li>
+                <li>计算双方战力</li>
+                <li>比较战力，战力高的一方获胜</li>
+                <li>获胜方留在格子，失败方被移除</li>
+            </ol>
+            <h3>战力计算</h3>
+            <p>战力 = 掷采值 × 倍率</p>
+            <h4>攻击方倍率计算</h4>
+            <ul>
+                <li>基础倍率：棋子的base_power</li>
+                <li>连携倍率：根据周围己方棋子的数量和类型计算</li>
+                <li>距离倍率：远程攻击时，根据距离和高度差计算</li>
+                <li>地形加成：根据所在地形的战斗加成计算</li>
+            </ul>
+            <h4>防守方倍率计算</h4>
+            <ul>
+                <li>基础倍率：棋子的defense_power</li>
+                <li>连携倍率：根据周围己方棋子的数量和类型计算</li>
+                <li>地形加成：根据所在地形的战斗加成计算</li>
+            </ul>
+            <h3>连携攻击</h3>
+            <p>连携攻击公式：Total = (Σx_i) × [1 + k × (N + T - 2)]</p>
+            <ul>
+                <li>Σx_i：所有连携棋子的攻击/防御连携倍率之和</li>
+                <li>k：连携系数，从0.1开始，每10回合增加0.1</li>
+                <li>N：连携棋子数量</li>
+                <li>T：连携棋子类型数量</li>
+            </ul>
+            <h3>特殊规则</h3>
+            <ul>
+                <li><strong>远程攻击</strong>：远程单位攻击近程单位且非临近时，可以触发远程攻击，攻击可以受到地形影响，的具体计算逻辑请参考棋子和地形tab内的介绍</li>
+                <li><strong>炮的攻击</strong>：炮可以攻击远处目标，但一回合只能使用一次攻击</li>
+                <li><strong>矢的远程狙击</strong>：矢在距离3时攻击有特殊效果</li>
+            </ul>
+        </div>
+        <div class="tab-content" id="card">
+            <h2>锦囊系统</h2>
+            <p>锦囊系统是游戏中的一种特殊机制，用于在战斗中提供额外的优势或策略。玩家可以在游戏中使用这些锦囊来增强自己的战斗能力。</p>
+            <img src="https://cdn.muvocal.com/up/2026/3/6/2a0b5e1a-1be4-4dcd-b7f0-19f482853cee.png" alt="锦囊示例" style="max-width: 300px; height: auto;">
+            <img src="https://cdn.muvocal.com/up/2026/3/6/f932ca61-455a-4291-92e8-ebebbf188364.png" alt="锦囊示例" style="max-width: 300px; height: auto;">
+            <h3>锦囊类型</h3>
+            <ul>
+                <li><strong>对战锦囊</strong>：提供额外的攻击能力，例如增加攻击范围或伤害值。该卡牌只能在对战时进行使用</li>
+                <ul>
+                    <li><strong>二位定一:</strong> 二进制数的第二位是1，即数值一定大于16，每局共7张。</li>
+                    <li><strong>首位定一:</strong> 二进制数的第一位为1，即数值一定大于32，每局共5张。</li>
+                    <li><strong>双星高照：</strong> 二进制数的前两位为1，即数值一定大于48，每局共3张。</li>
+                    <li><strong>三阳开泰：</strong>二进制数的前三位为1， 即数值一定大于56，每局共2张。</li>
+                </ul>
+                <li><strong>招募锦囊</strong>：能够招募棋子，可以随时使用。获取锦囊概率随机，随机标准为：<br>只能招募除了X枭之外的全部棋子，其中70%的概率可以招募棋子base_power小于1.5棋子，30%可以招募base_power大于等于1.5的棋子。此后，有60%概率招募近程攻击棋子，40%招募远程攻击棋子。再后内部具体的棋子均为随机选择。</li>
+                <ul>
+                    <li><strong>招募工兵:</strong> 战斗结束后随机获取的卡片，招募后会生成一个工兵棋子。</li>
+                    <li><strong>招募散兵:</strong> 战斗结束后随机获取的卡片，招募后会生成一个散兵棋子。</li>
+                    <li><strong>招募炮兵：</strong>战斗结束后随机获取的卡片，招募后会生成一个炮兵棋子。</li>
+                    <li><strong>招募矢卒：</strong>战斗结束后随机获取的卡片，招募后会生成一个矢卒棋子。</li>
+                </ul>
+            </ul>
+        </div>
+        
+        <a href="/game/bo" class="back-button">返回首页</a>
+    </div>
+    
+    <script>
+        function showTab(tabId) {
+            // 隐藏所有内容
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签的活跃状态
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的内容和标签
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            // 如果切换到棋子信息标签，加载棋子数据
+            if (tabId === 'pieces') {
+                loadPieceTypes();
+            }
+        }
+        
+        // 从后端API获取棋子数据
+        function fetchPieceTypesFromAPI() {
+            return fetch('/game/bo/api/get-piece-types')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('API请求失败');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('从API获取棋子数据:', data);
+                    // 处理API返回的数据格式
+                    if (data.success && data.piece_types) {
+                        // 将对象转换为数组
+                        return Object.values(data.piece_types).map(piece => ({
+                            ...piece,
+                            type: Object.keys(data.piece_types).find(key => data.piece_types[key] === piece) || piece.piece_id
+                        }));
+                    }
+                    return [];
+                })
+                .catch(error => {
+                    console.error('获取棋子数据失败:', error);
+                    return [];
+                });
+        }
+
+        // 存储棋子数据到IndexedDB
+        function storePieceTypesToIndexedDB(pieceTypes) {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('GameDB', 2);
+                
+                request.onerror = function(event) {
+                    console.error('IndexedDB 打开失败:', event.target.error);
+                    reject(event.target.error);
+                };
+                
+                request.onsuccess = function(event) {
+                    const db = event.target.result;
+                    const transaction = db.transaction(['pieceTypes'], 'readwrite');
+                    const store = transaction.objectStore('pieceTypes');
+                    
+                    // 清空现有数据
+                    const clearRequest = store.clear();
+                    
+                    clearRequest.onsuccess = function() {
+                        // 存储新数据
+                        let count = 0;
+                        pieceTypes.forEach(piece => {
+                            const addRequest = store.add(piece);
+                            addRequest.onsuccess = function() {
+                                count++;
+                                if (count === pieceTypes.length) {
+                                    resolve();
+                                }
+                            };
+                            addRequest.onerror = function(event) {
+                                console.error('存储棋子数据失败:', event.target.error);
+                                if (count === pieceTypes.length - 1) {
+                                    resolve();
+                                }
+                            };
+                        });
+                    };
+                    
+                    clearRequest.onerror = function(event) {
+                        console.error('清空棋子数据失败:', event.target.error);
+                        reject(event.target.error);
+                    };
+                };
+                
+                request.onupgradeneeded = function(event) {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains('pieceTypes')) {
+                        db.createObjectStore('pieceTypes', { keyPath: 'type' });
+                    }
+                };
+            });
+        }
+
+        // 初始化IndexedDB并加载棋子数据
+        function loadPieceTypes() {
+            const request = indexedDB.open('GameDB', 2);
+            
+            request.onerror = function(event) {
+                console.error('IndexedDB 打开失败:', event.target.error);
+                // 从API获取数据
+                fetchPieceTypesFromAPI().then(pieceTypes => {
+                    if (pieceTypes.length > 0) {
+                        storePieceTypesToIndexedDB(pieceTypes).then(() => {
+                            updatePieceTable(pieceTypes);
+                        });
+                    } else {
+                        updatePieceTable([]);
+                    }
+                });
+            };
+            
+            request.onsuccess = function(event) {
+                const db = event.target.result;
+                const transaction = db.transaction(['pieceTypes'], 'readonly');
+                const store = transaction.objectStore('pieceTypes');
+                const getAllRequest = store.getAll();
+                
+                getAllRequest.onsuccess = function() {
+                    const pieceTypes = getAllRequest.result;
+                    console.log('从IndexedDB获取棋子数据:', pieceTypes);
+                    
+                    if (pieceTypes.length === 0) {
+                        // IndexedDB中没有数据，从API获取
+                        fetchPieceTypesFromAPI().then(apiPieceTypes => {
+                            if (apiPieceTypes.length > 0) {
+                                storePieceTypesToIndexedDB(apiPieceTypes).then(() => {
+                                    updatePieceTable(apiPieceTypes);
+                                });
+                            } else {
+                                updatePieceTable([]);
+                            }
+                        });
+                    } else {
+                        updatePieceTable(pieceTypes);
+                    }
+                };
+                
+                getAllRequest.onerror = function(event) {
+                    console.error('获取棋子类型数据失败:', event.target.error);
+                    // 从API获取数据
+                    fetchPieceTypesFromAPI().then(pieceTypes => {
+                        if (pieceTypes.length > 0) {
+                            storePieceTypesToIndexedDB(pieceTypes).then(() => {
+                                updatePieceTable(pieceTypes);
+                            });
+                        } else {
+                            updatePieceTable([]);
+                        }
+                    });
+                };
+            };
+            
+            request.onupgradeneeded = function(event) {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('pieceTypes')) {
+                    db.createObjectStore('pieceTypes', { keyPath: 'type' });
+                }
+            };
+        }
+        
+        // 更新棋子表格
+        function updatePieceTable(pieceTypes) {
+            const table = document.getElementById('piece-types-table');
+            const tbody = table.querySelector('tbody') || table;
+            
+            // 清空表格除了表头
+            while (tbody.rows.length > 1) {
+                tbody.deleteRow(1);
+            }
+            
+            if (pieceTypes.length === 0) {
+                const row = tbody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 11;
+                cell.style.textAlign = 'center';
+                cell.style.padding = '20px';
+                cell.textContent = '未找到棋子数据，请先进入游戏加载数据';
+                return;
+            }
+            
+            // 生成表格行
+            pieceTypes.forEach(piece => {
+                const row = tbody.insertRow();
+                
+                // 棋子类型名称
+                const nameCell = row.insertCell();
+                nameCell.textContent = piece.name || piece.type;
+                
+                // 标识
+                const typeCell = row.insertCell();
+                typeCell.textContent = piece.type;
+                
+                // 移动范围
+                const moveRangeCell = row.insertCell();
+                moveRangeCell.textContent = piece.move_range || 1;
+                
+                // 攻击范围
+                const combatRangeCell = row.insertCell();
+                combatRangeCell.textContent = piece.combat_range || 1;
+                
+                // 攻击倍率
+                const basePowerCell = row.insertCell();
+                basePowerCell.textContent = piece.base_power || 1.0;
+                
+                // 防御倍率
+                const defensePowerCell = row.insertCell();
+                defensePowerCell.textContent = piece.defense_power || 1.0;
+                
+                // 移动成本
+                const moveCostCell = row.insertCell();
+                moveCostCell.textContent = piece.move_cost || 1;
+                
+                // 攻击连携
+                const attackCoopCell = row.insertCell();
+                attackCoopCell.textContent = piece.attack_coop || 1.0;
+                
+                // 防御连携
+                const defenseCoopCell = row.insertCell();
+                defenseCoopCell.textContent = piece.defense_coop || 1.0;
+                
+                // 连携范围
+                const coopRangeCell = row.insertCell();
+                coopRangeCell.textContent = piece.coop_range || 1;
+                
+                // 特殊能力
+                const abilityCell = row.insertCell();
+                let ability = '';
+                if (piece.terrain_change === true || piece.terrain_change === 1) {
+                    ability += '可修改地形高度';
+                }
+                if (piece.attack_type === 'ranged') {
+                    ability += (ability ? '，' : '') + '远程攻击';
+                }
+                if (piece.description) {
+                    ability += (ability ? '，' : '') + piece.description;
+                }
+                abilityCell.textContent = ability || '无';
+            });
+        }
+        
+        // 页面加载时，如果当前是棋子信息标签，加载数据
+        window.onload = function() {
+            const activeTab = document.querySelector('.tab-content.active');
+            if (activeTab && activeTab.id === 'pieces') {
+                loadPieceTypes();
+            }
+        };
+    </script>
+</body>
+</html>

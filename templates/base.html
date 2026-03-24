@@ -129,7 +129,7 @@
 
     <div class="navbar">
         <div class="brand">
-            <a href="/" style="font-size: 20px; font-weight: bold; margin-left: 0;">🏰 六博对战平台</a>
+            <a href="/game/bo" style="font-size: 20px; font-weight: bold; margin-left: 0;">🏰 六博对战平台</a>
         </div>
 
         <div class="user-controls">
@@ -158,9 +158,10 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
-        // 修改后: 指定 path 参数
+        // 修改后: 使用绝对路径
         const socket = io({
-            path: '/game/bo/socket.io'  // 这里加上你的前缀
+            // path: '/game/bo/socket.io'  // 绝对路径，与后端配置一致
+            path: '/socket.io'
         });
     </script>
     {% block extra_js %}{% endblock %}

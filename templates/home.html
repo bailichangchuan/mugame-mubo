@@ -8,8 +8,17 @@
     <p>欢迎, {{ user.username }}</p>
     
     <div style="margin: 20px;">
+        <h2>创建新房间</h2>
+        <div style="margin: 10px;">
+            <label>选择地图:</label>
+            <select id="map-select" style="padding: 8px; margin-right: 10px;">
+                <option value="default_map">默认地图</option>
+            </select>
+            <button onclick="refreshMapList()">刷新地图列表</button>
+        </div>
         <button onclick="createGame()">创建新房间</button>
         <button onclick="createAIGame()">和AI玩</button>
+        <button onclick="openMapEditor()">地图编辑器</button>
     </div>
 
     
@@ -17,6 +26,20 @@
         <input type="text" id="room-input" placeholder="输入房间ID">
         <button onclick="joinGame()">加入房间</button>
     </div>
+    
+    <div style="margin: 20px;">
+        <button onclick="window.location.href='/game/bo/my-games'" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">我的对局记录</button>
+    </div>
+    
+    <div style="margin: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 5px; background-color: #f9f9f9;">
+        <h2>🏆 排行榜前三名</h2>
+        <div id="top-users-container" style="display: flex; gap: 20px; margin-top: 10px;">
+            <!-- 前三名用户将通过JavaScript动态添加 -->
+            <div style="text-align: center; padding: 10px; border-radius: 5px; width: 150px;">加载中...</div>
+        </div>
+        <button onclick="window.location.href='/game/bo/rankings'" style="margin-top: 10px;">查看完整排名</button>
+    </div>
+    
     <button id="rulesBtn" class="rules-trigger-btn">
         📖 游戏说明
     </button>
@@ -76,7 +99,14 @@
 {% block extra_js %}
 <script>
     function createGame() {
-        fetch('/game/bo/api/create', { method: 'POST' })
+        const selectedMap = document.getElementById('map-select').value;
+        fetch('/game/bo/api/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ map_name: selectedMap })
+        })
             .then(res => res.json())
             .then(data => {
                 if(data.success) {
@@ -84,6 +114,42 @@
                     window.location.href = `/game/bo/room/${data.room_id}`;
                 }
             });
+    }
+    
+    function createAIGame() {
+        const selectedMap = document.getElementById('map-select').value;
+        // 创建AI游戏房间
+        fetch('/game/bo/api/create-ai', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ map_name: selectedMap })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                window.location.href = `/game/bo/ai-room/${data.room_id}`;
+            }
+        });
+    }
+    
+    function refreshMapList() {
+        fetch('/game/bo/api/get-maps')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const select = document.getElementById('map-select');
+                select.innerHTML = '';
+                
+                data.maps.forEach(map => {
+                    const option = document.createElement('option');
+                    option.value = map.name;
+                    option.textContent = map.display_name;
+                    select.appendChild(option);
+                });
+            }
+        });
     }
 
     function joinGame() {
@@ -99,9 +165,26 @@
         .then(data => {
             if(data.success) {
                 // 跳转到房间页 (状态是playing)
-                window.location.href = `/bo/room/${data.room_id}`;
+                window.location.href = `/game/bo/room/${data.room_id}`;
             } else {
                 alert(data.msg);
+            }
+        });
+    }
+    
+    function openMapEditor() {
+        window.location.href = '/game/bo/map-editor';
+    }
+    
+    function createAIGame() {
+        // 创建AI游戏房间
+        fetch('/game/bo/api/create-ai', {
+            method: 'POST'
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                window.location.href = `/game/bo/ai-room/${data.room_id}`;
             }
         });
     }
@@ -112,7 +195,8 @@
     
     // 1. 点击按钮打开弹窗
     btn.onclick = function() {
-      modal.style.display = "block";
+        window.location.href = '/game/bo/guide';
+    //   modal.style.display = "block";
     }
     
     // 2. 点击 "X" 关闭
@@ -126,5 +210,69 @@
         modal.style.display = "none";
       }
     }
+    
+    // 页面加载时自动刷新地图列表
+    refreshMapList();
+    
+    // 页面加载时获取排名前三的用户
+    function loadTopUsers() {
+        fetch('/game/bo/api/top-users')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const container = document.getElementById('top-users-container');
+                    container.innerHTML = '';
+                    
+                    if (data.top_users.length === 0) {
+                        container.innerHTML = '<div style="text-align: center; padding: 10px; border-radius: 5px; width: 100%;">暂无排名数据</div>';
+                        return;
+                    }
+                    
+                    data.top_users.forEach(item => {
+                        const userDiv = document.createElement('div');
+                        userDiv.style.textAlign = 'center';
+                        userDiv.style.padding = '15px';
+                        userDiv.style.borderRadius = '5px';
+                        userDiv.style.width = '150px';
+                        
+                        // 设置前三名的特殊样式
+                        if (item.rank === 1) {
+                            userDiv.style.backgroundColor = '#fff9c4';
+                            userDiv.style.border = '2px solid gold';
+                        } else if (item.rank === 2) {
+                            userDiv.style.backgroundColor = '#f5f5f5';
+                            userDiv.style.border = '2px solid silver';
+                        } else if (item.rank === 3) {
+                            userDiv.style.backgroundColor = '#fff3e0';
+                            userDiv.style.border = '2px solid #cd7f32';
+                        } else {
+                            userDiv.style.backgroundColor = '#f0f0f0';
+                        }
+                        
+                        userDiv.innerHTML = `
+                            <div style="font-size: 24px; font-weight: bold; margin-bottom: 5px;">
+                                ${item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : item.rank === 3 ? '🥉' : ''}
+                            </div>
+                            <div style="font-weight: bold; margin-bottom: 5px;">${item.username}</div>
+                            <div style="font-size: 12px; color: #666;">获胜: ${item.games_won}</div>
+                            <div style="font-size: 12px; color: #666;">胜率: ${item.win_rate}%</div>
+                        `;
+                        
+                        container.appendChild(userDiv);
+                    });
+                } else {
+                    const container = document.getElementById('top-users-container');
+                    container.innerHTML = '<div style="text-align: center; padding: 10px; border-radius: 5px; width: 100%; color: red;">加载失败</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const container = document.getElementById('top-users-container');
+                container.innerHTML = '<div style="text-align: center; padding: 10px; border-radius: 5px; width: 100%; color: red;">加载失败，请刷新页面重试</div>';
+            });
+    }
+    
+    // 页面加载时调用
+    loadTopUsers();
 </script>
 {% endblock %}

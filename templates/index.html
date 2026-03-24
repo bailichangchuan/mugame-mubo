@@ -61,7 +61,216 @@
         <h3 id="combat-result"></h3>
     </div>
 
+    <!-- 游戏说明弹窗 -->
+    <div id="game-guide-modal" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; color: #333; padding: 30px; border-radius: 10px; border: 3px solid #3498db; display: none; z-index: 2000; width: 80%; max-width: 900px; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #3498db; margin: 0;">🎮 博弈象棋 · 游戏说明</h2>
+            <button onclick="closeGameGuide()" style="padding: 8px 16px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">关闭</button>
+        </div>
+        
+        <!-- 导航标签 -->
+        <div style="display: flex; border-bottom: 2px solid #3498db; margin-bottom: 20px;">
+            <button onclick="showGuideTab('basic')" class="guide-tab" style="padding: 10px 20px; margin-right: 5px; border: none; background: #3498db; color: white; border-radius: 5px 5px 0 0; cursor: pointer;">游戏基本信息</button>
+            <button onclick="showGuideTab('pieces')" class="guide-tab" style="padding: 10px 20px; margin-right: 5px; border: none; background: #95a5a6; color: white; border-radius: 5px 5px 0 0; cursor: pointer;">棋子信息</button>
+            <button onclick="showGuideTab('terrain')" class="guide-tab" style="padding: 10px 20px; margin-right: 5px; border: none; background: #95a5a6; color: white; border-radius: 5px 5px 0 0; cursor: pointer;">地形与高度</button>
+            <button onclick="showGuideTab('combat')" class="guide-tab" style="padding: 10px 20px; border: none; background: #95a5a6; color: white; border-radius: 5px 5px 0 0; cursor: pointer;">战斗系统</button>
+        </div>
+        
+        <!-- 内容区域 -->
+        <div id="guide-content">
+            <!-- 基本信息 -->
+            <div id="basic-tab" class="guide-content-tab">
+                <h3 style="color: #3498db;">游戏基本信息</h3>
+                <p>博弈象棋是一款基于传统象棋规则的创新对战游戏，融合了策略、运气和战术元素。</p>
+                <h4>游戏目标</h4>
+                <p>通过战斗和策略，击败对方的核心棋子（枭）。</p>
+                <h4>游戏流程</h4>
+                <ol>
+                    <li>玩家创建或加入房间</li>
+                    <li>游戏开始，红方先手</li>
+                    <li>每回合玩家先掷采（掷骰子）决定步数</li>
+                    <li>玩家使用步数移动棋子或攻击对方棋子</li>
+                    <li>当一方的枭被击败时，游戏结束</li>
+                </ol>
+                <h4>回合规则</h4>
+                <ul>
+                    <li>每回合玩家有一次掷采机会</li>
+                    <li>掷采结果决定本回合可用步数</li>
+                    <li>移动或攻击会消耗步数</li>
+                    <li>步数用完或玩家主动结束回合，回合结束</li>
+                </ul>
+            </div>
+            
+            <!-- 棋子信息 -->
+            <div id="pieces-tab" class="guide-content-tab" style="display: none;">
+                <h3 style="color: #3498db;">棋子信息</h3>
+                <h4>棋子类型</h4>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <tr style="background: #f2f2f2;">
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">棋子类型</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标识</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">移动范围</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">攻击范围</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">攻击倍率</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">防御倍率</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">特殊能力</th>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">枭</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">X</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.3</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.3</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">核心棋子，被击败则游戏结束</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">散</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">S</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.0</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.0</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">基础棋子</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">炮</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">P</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1-3</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.5</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">0.7</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">远程攻击，可攻击远处目标</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">矢</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">T</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1-3</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.2</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">0.8</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">远程攻击，距离3时有特殊效果</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">工</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">G</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">0.8</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">0.8</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">可修改地形高度</td>
+                    </tr>
+                </table>
+                <h4>棋子属性</h4>
+                <ul>
+                    <li><strong>move_range</strong>：移动范围，决定棋子每回合最多可以移动的格子数</li>
+                    <li><strong>move_cost</strong>：移动成本，每移动一格消耗的步数</li>
+                    <li><strong>combat_range</strong>：攻击范围，决定棋子可以攻击的最大距离</li>
+                    <li><strong>base_power</strong>：攻击倍率，作为攻击方时的基础攻击力</li>
+                    <li><strong>defense_power</strong>：防御倍率，作为防守方时的基础防御力</li>
+                    <li><strong>attack_coop</strong>：攻击连携倍率，当己方棋子为进攻方触发连携攻击时的倍率</li>
+                    <li><strong>defense_coop</strong>：防守连携倍率，当己方棋子为防守方触发连携攻击时的倍率</li>
+                    <li><strong>coop_range</strong>：连携范围，决定连携攻击的有效范围</li>
+                    <li><strong>terrain_change</strong>：地形修改能力，1表示可以修改地形高度</li>
+                </ul>
+            </div>
+            
+            <!-- 地形与高度 -->
+            <div id="terrain-tab" class="guide-content-tab" style="display: none;">
+                <h3 style="color: #3498db;">地形与高度</h3>
+                <h4>地形类型</h4>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <tr style="background: #f2f2f2;">
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">地形类型</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">移动成本</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">战斗加成</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">描述</th>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">平原</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.0</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.0</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">基础地形，无特殊效果</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">河流</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">2.0</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">0.8</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">移动成本增加，战斗效果减弱</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">山地</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.5</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.2</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">移动成本增加，战斗效果增强</td>
+                    </tr>
+                </table>
+                <h4>高度系统</h4>
+                <p>棋盘上每个格子都有高度值，高度会影响：</p>
+                <ul>
+                    <li><strong>移动</strong>：相邻格子高度差超过1时，无法移动</li>
+                    <li><strong>攻击</strong>：高处攻击低处时，攻击力会有加成</li>
+                    <li><strong>远程攻击</strong>：高度差会影响远程攻击的最大范围</li>
+                </ul>
+                <p>高度值范围：-1（低洼）到 3（高山）</p>
+                <h4>地形修改</h4>
+                <p>工棋子可以修改地形高度，每次修改可以：</p>
+                <ul>
+                    <li>增加1点高度</li>
+                    <li>减少1点高度</li>
+                </ul>
+            </div>
+            
+            <!-- 战斗系统 -->
+            <div id="combat-tab" class="guide-content-tab" style="display: none;">
+                <h3 style="color: #3498db;">战斗系统</h3>
+                <h4>战斗触发</h4>
+                <p>当一方棋子移动到另一方棋子所在的格子时，会触发战斗。</p>
+                <h4>战斗流程</h4>
+                <ol>
+                    <li>双方掷采（生成6位二进制数）</li>
+                    <li>计算双方战力</li>
+                    <li>比较战力，战力高的一方获胜</li>
+                    <li>获胜方留在格子，失败方被移除</li>
+                </ol>
+                <h4>战力计算</h4>
+                <p>战力 = 掷采值 × 倍率</p>
+                <h5>攻击方倍率计算</h5>
+                <ul>
+                    <li>基础倍率：棋子的base_power</li>
+                    <li>连携倍率：根据周围己方棋子的数量和类型计算</li>
+                    <li>距离倍率：远程攻击时，根据距离和高度差计算</li>
+                    <li>地形加成：根据所在地形的战斗加成计算</li>
+                </ul>
+                <h5>防守方倍率计算</h5>
+                <ul>
+                    <li>基础倍率：棋子的defense_power</li>
+                    <li>连携倍率：根据周围己方棋子的数量和类型计算</li>
+                    <li>地形加成：根据所在地形的战斗加成计算</li>
+                </ul>
+                <h4>连携攻击</h4>
+                <p>连携攻击公式：Total = (Σx_i) × [1 + k × (N + T - 2)]</p>
+                <ul>
+                    <li>Σx_i：所有连携棋子的攻击/防御连携倍率之和</li>
+                    <li>k：连携系数，从0.1开始，每10回合增加0.1</li>
+                    <li>N：连携棋子数量</li>
+                    <li>T：连携棋子类型数量</li>
+                </ul>
+                <h4>特殊规则</h4>
+                <ul>
+                    <li><strong>远程攻击</strong>：远程单位攻击近程单位且非临近时，需要满足特殊条件</li>
+                    <li><strong>炮的攻击</strong>：炮可以攻击远处目标，但一回合只能使用一次攻击</li>
+                    <li><strong>矢的远程狙击</strong>：矢在距离3时攻击有特殊效果</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 遮罩层 -->
+    <div id="guide-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 1999;"></div>
+
     <h1>博弈象棋 · 决斗版</h1>
+    <button onclick="openGameGuide()" style="margin: 10px; padding: 10px 20px; font-size: 16px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">游戏说明</button>
 
     {% if not current_user.is_authenticated %}
         <div style="margin-top:100px;">
@@ -101,6 +310,38 @@
     {% endif %}
 
     <script>
+        // 游戏说明弹窗相关函数
+        function openGameGuide() {
+            document.getElementById('game-guide-modal').style.display = 'block';
+            document.getElementById('guide-overlay').style.display = 'block';
+        }
+        
+        function closeGameGuide() {
+            document.getElementById('game-guide-modal').style.display = 'none';
+            document.getElementById('guide-overlay').style.display = 'none';
+        }
+        
+        function showGuideTab(tabId) {
+            // 隐藏所有内容
+            const tabContents = document.querySelectorAll('.guide-content-tab');
+            tabContents.forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // 移除所有标签的活跃状态
+            const guideTabs = document.querySelectorAll('.guide-tab');
+            guideTabs.forEach(tab => {
+                tab.style.background = '#95a5a6';
+            });
+            
+            // 显示选中的内容和标签
+            document.getElementById(tabId + '-tab').style.display = 'block';
+            event.currentTarget.style.background = '#3498db';
+        }
+        
+        // 点击遮罩层关闭弹窗
+        document.getElementById('guide-overlay').onclick = closeGameGuide;
+        
         const socket = io();
         let currentRoomId = null;
         let mySide = null; 
