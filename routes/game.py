@@ -5,6 +5,8 @@ from flask_socketio import emit
 from extensions import db, socketio
 from config import CARD_CONFIG
 from models import GameRoom, User, CombatLog
+from game_logic.ai_player import AIPlayer, create_ai_player
+from game_logic.piece_manager import PieceManager
 
 # --- 辅助函数: 掷采算法 ---
 def generate_sticks():

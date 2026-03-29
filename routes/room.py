@@ -304,6 +304,8 @@ def create_ai_room_api():
     # 初始化卡牌
     initial_cards = {}
     initial_cards[str(current_user.id)] = {k: v['limit'] for k, v in CARD_CONFIG.items()}
+    # 为AI玩家初始化卡牌
+    initial_cards['ai'] = {k: v['limit'] for k, v in CARD_CONFIG.items()}
 
     # 构建游戏状态
     game_state = {
@@ -318,10 +320,12 @@ def create_ai_room_api():
         'active_cards': {},
         'terrain': map_data['terrain'],
         'terrain_types': map_data['terrain_types'],
-        'piece_types': map_data['piece_types']
+        'piece_types': map_data['piece_types'],
+        'is_ai_game': True  # 标记这是一个AI对战游戏
     }
 
-    new_room = GameRoom(player1_id=current_user.id, status='waiting')
+    # 创建房间，直接进入playing状态，player2_id设为-1表示AI玩家
+    new_room = GameRoom(player1_id=current_user.id, player2_id=-1, status='playing')
     new_room.set_state(game_state)
     db.session.add(new_room)
     
