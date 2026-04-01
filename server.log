@@ -5,60 +5,7 @@
   warnings.warn(
  * Debugger is active!
  * Debugger PIN: 549-823-704
-(88184) wsgi starting up on http://127.0.0.1:5212
-(88184) accepted ('127.0.0.1', 54900)
-127.0.0.1 - - [01/Apr/2026 09:13:41] "GET /socket.io/?EIO=4&transport=polling&t=Pr6cdR5 HTTP/1.1" 200 300 0.000415
-127.0.0.1 - - [01/Apr/2026 09:13:41] "POST /socket.io/?EIO=4&transport=polling&t=Pr6cdRC&sid=S_mMNJ-pGG8uWk20AAAA HTTP/1.1" 200 219 0.001998
-(88184) accepted ('127.0.0.1', 54901)
-(88184) accepted ('127.0.0.1', 54902)
-127.0.0.1 - - [01/Apr/2026 09:13:41] "GET /socket.io/?EIO=4&transport=polling&t=Pr6cdRD&sid=S_mMNJ-pGG8uWk20AAAA HTTP/1.1" 200 181 0.000085
-127.0.0.1 - - [01/Apr/2026 09:13:41] "GET /socket.io/?EIO=4&transport=polling&t=Pr6cdRM&sid=S_mMNJ-pGG8uWk20AAAA HTTP/1.1" 200 181 0.000087
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /socket.io/?EIO=4&transport=websocket&sid=S_mMNJ-pGG8uWk20AAAA HTTP/1.1" 200 0 31.845424
-(88184) accepted ('127.0.0.1', 54906)
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /game/bo/ai-room?map=default_map HTTP/1.1" 200 22846 0.030984
-(88184) accepted ('127.0.0.1', 54907)
-(88184) accepted ('127.0.0.1', 54908)
-(88184) accepted ('127.0.0.1', 54909)
-(88184) accepted ('127.0.0.1', 54910)
-(88184) accepted ('127.0.0.1', 54911)
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /static/js/ai_room/ai_game_combat.js HTTP/1.1" 304 565 0.011527
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /static/js/ai_room/ai_game_sound.js HTTP/1.1" 304 564 0.002924
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /static/js/ai_room/ai_game_utils.js HTTP/1.1" 304 562 0.001131
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /static/css/ai_room/ai_game.css HTTP/1.1" 304 559 0.000895
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /static/js/ai_player.js HTTP/1.1" 304 560 0.000625
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /static/js/ai_room/ai_game_board.js HTTP/1.1" 304 564 0.002728
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /static/js/ai_room/ai_game_main.js HTTP/1.1" 304 563 0.004273
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /static/bg_original.png HTTP/1.1" 304 566 0.003108
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /socket.io/?EIO=4&transport=polling&t=Pr6clE5 HTTP/1.1" 200 300 0.000323
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /game/bo/api/ai-init?map=default_map HTTP/1.1" 200 8461 0.012286
-127.0.0.1 - - [01/Apr/2026 09:14:13] "POST /socket.io/?EIO=4&transport=polling&t=Pr6clEL&sid=Kh5riaFTsYUuXfIXAAAC HTTP/1.1" 200 219 0.000281
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /socket.io/?EIO=4&transport=polling&t=Pr6clEL.0&sid=Kh5riaFTsYUuXfIXAAAC HTTP/1.1" 200 213 0.000074
-(88184) accepted ('127.0.0.1', 54912)
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /socket.io/?EIO=4&transport=polling&t=Pr6clF6&sid=Kh5riaFTsYUuXfIXAAAC HTTP/1.1" 200 181 0.000311
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /socket.io/?EIO=4&transport=polling&t=Pr6clFF&sid=Kh5riaFTsYUuXfIXAAAC HTTP/1.1" 200 181 0.001127
-127.0.0.1 - - [01/Apr/2026 09:14:13] "GET /socket.io/?EIO=4&transport=polling&t=Pr6clN-&sid=Kh5riaFTsYUuXfIXAAAC HTTP/1.1" 200 181 0.000130
-127.0.0.1 - - [01/Apr/2026 09:14:14] "GET /static/bgm.mp3 HTTP/1.1" 206 688 0.002769
-127.0.0.1 - - [01/Apr/2026 09:14:14] "GET /static/bgm.mp3 HTTP/1.1" 206 6198458 0.017882
-127.0.0.1 - - [01/Apr/2026 09:14:14] "GET /favicon.ico HTTP/1.1" 404 682 0.001537
- * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/game.py', reloading
- * Restarting with stat
-/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
-  warnings.warn(
- * Debugger is active!
- * Debugger PIN: 549-823-704
-(89724) wsgi starting up on http://127.0.0.1:5212
-(89724) accepted ('127.0.0.1', 55011)
-127.0.0.1 - - [01/Apr/2026 09:23:13] "GET /socket.io/?EIO=4&transport=polling&t=Pr6ep6S HTTP/1.1" 200 300 0.001081
-127.0.0.1 - - [01/Apr/2026 09:23:13] "POST /socket.io/?EIO=4&transport=polling&t=Pr6ep6a&sid=dctXeeovoPcjqWBJAAAA HTTP/1.1" 200 219 0.000524
-(89724) accepted ('127.0.0.1', 55012)
-(89724) accepted ('127.0.0.1', 55013)
-127.0.0.1 - - [01/Apr/2026 09:23:13] "GET /socket.io/?EIO=4&transport=polling&t=Pr6ep6b&sid=dctXeeovoPcjqWBJAAAA HTTP/1.1" 200 181 0.000272
-127.0.0.1 - - [01/Apr/2026 09:23:13] "GET /socket.io/?EIO=4&transport=polling&t=Pr6ep6k&sid=dctXeeovoPcjqWBJAAAA HTTP/1.1" 200 181 0.000120
-127.0.0.1 - - [01/Apr/2026 09:30:11] "GET /socket.io/?EIO=4&transport=websocket&sid=dctXeeovoPcjqWBJAAAA HTTP/1.1" 200 0 418.014652
- * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/game.py', reloading
- * Restarting with stat
-/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
-  warnings.warn(
- * Debugger is active!
- * Debugger PIN: 549-823-704
-(94096) wsgi starting up on http://127.0.0.1:5212
+(3662) wsgi starting up on http://127.0.0.1:5212
+(3662) accepted ('127.0.0.1', 55836)
+Invalid session 3n5oPTkDQhQs8_ycAABG (further occurrences of this error will be logged with level INFO)
+127.0.0.1 - - [01/Apr/2026 10:08:02] "GET /socket.io/?EIO=4&transport=websocket&sid=3n5oPTkDQhQs8_ycAABG HTTP/1.1" 400 241 0.000265

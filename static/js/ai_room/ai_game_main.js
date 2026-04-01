@@ -1002,6 +1002,15 @@ function endTurn() {
     }
 }
 
+function giveUpGame() {
+    if (!confirm('放弃当前进度？刷新后将重新开始。')) {
+        return;
+    }
+    clearGameStateCookie();
+    addLog('🗑️ 已放弃当前进度');
+    alert('已放弃。刷新页面后将重新开始。');
+}
+
 // ========== AI回合 ==========
 
 function executeAITurn() {
@@ -1602,8 +1611,7 @@ function showGameStartAnnouncement(onComplete) {
 }
 
 function adjustSidebarsToBoardBottom() {
-    // 侧栏现在使用 CSS sticky 定位，不再需要 JS 动态调整
-    // 保留此函数以避免其他代码调用出错
+    // 侧栏高度已在 CSS 中固定，不需要 JS 调整
 }
 
 function startPlayerTurn() {
