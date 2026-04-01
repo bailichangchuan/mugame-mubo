@@ -1,0 +1,2083 @@
+{% extends "base.html" %}
+
+{% block title %}地图编辑器 - 博棋{% endblock %}
+
+{% block extra_css %}
+<style>
+    .editor-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px;
+    }
+    
+    .editor-header {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .map-info {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        min-width: 300px;
+    }
+    
+    .map-info input,
+    .map-info select,
+    .map-info textarea {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .editor-main {
+        display: flex;
+        gap: 20px;
+        width: 100%;
+        max-width: 1200px;
+    }
+    
+    .map-canvas {
+        flex: 1;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 20px;
+        min-width: 500px;
+    }
+    
+    .editor-tools {
+        width: 300px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 20px;
+    }
+    
+    .tool-section {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .tool-section h3 {
+        margin-top: 0;
+        color: #333;
+        font-size: 16px;
+    }
+    
+    .terrain-palette {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .terrain-item {
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.2s;
+    }
+    
+    .terrain-item:hover {
+        border-color: #3498db;
+        background: #f0f8ff;
+    }
+    
+    .terrain-item.active {
+        border-color: #27ae60;
+        background: #d4edda;
+    }
+    
+    .piece-palette {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .piece-item {
+        padding: 8px 12px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.2s;
+        min-width: 60px;
+    }
+    
+    .piece-item:hover {
+        border-color: #3498db;
+        background: #f0f8ff;
+    }
+    
+    .piece-item.active {
+        border-color: #27ae60;
+        background: #d4edda;
+    }
+    
+    .board-grid {
+        display: grid;
+        gap: 1px;
+        background: #333;
+        margin: 20px auto;
+        border: 2px solid #333;
+        border-radius: 5px;
+    }
+    
+    .board-cell {
+        width: 50px;
+        height: 50px;
+        background: #f0e6d2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .board-cell:hover {
+        background: #e0d0b0;
+    }
+    
+    .cell-terrain {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        font-size: 10px;
+        opacity: 0.7;
+    }
+    
+    .cell-height {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        font-size: 10px;
+        opacity: 0.7;
+        color: #666;
+    }
+    
+    .cell-piece {
+        font-size: 24px;
+    }
+    
+    .cell-coords {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        font-size: 8px;
+        opacity: 0.5;
+    }
+    
+    .plain { background: #f0e6d2; }
+    .mountain { background: #a09080; }
+    .water { background: #87ceeb; }
+    
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+        justify-content: center;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s;
+    }
+    
+    .btn-primary { background: #3498db; color: white; }
+    .btn-primary:hover { background: #2980b9; }
+    
+    .btn-success { background: #27ae60; color: white; }
+    .btn-success:hover { background: #219150; }
+    
+    .btn-danger { background: #e74c3c; color: white; }
+    .btn-danger:hover { background: #c0392b; }
+    
+    .btn-secondary { background: #95a5a6; color: white; }
+    .btn-secondary:hover { background: #7f8c8d; }
+    
+    .error-message {
+        color: red;
+        margin: 10px 0;
+    }
+    
+    .success-message {
+        color: green;
+        margin: 10px 0;
+    }
+    
+    .terrain-types,
+    .piece-types {
+        margin-top: 15px;
+        background: #f9f9f9;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    
+    .type-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .type-item:last-child {
+        border-bottom: none;
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+    }
+    
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 90%;
+        max-width: 800px;
+        border-radius: 10px;
+    }
+    
+    /* 棋子管理模态框特殊样式 */
+    #pieceModal .modal-content {
+        max-width: 900px;
+    }
+    
+    /* 表单布局优化 */
+    .form-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 10px;
+    }
+    
+    .form-group {
+        flex: 1;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .modal-body {
+        margin-bottom: 20px;
+    }
+    
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .close:hover {
+        color: black;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="editor-container">
+    <h1>🗺️ 地图编辑器</h1>
+    
+    <div class="editor-header">
+        <div class="map-info">
+            <h3>地图信息</h3>
+            <div>
+                <label>地图名称:</label>
+                <input type="text" id="map-name" value="新地图" placeholder="输入地图名称">
+            </div>
+            <div>
+                <label>地图描述:</label>
+                <textarea id="map-description" placeholder="输入地图描述" rows="2"></textarea>
+            </div>
+            <div>
+                <label>地图宽度:</label>
+                <select id="map-width">
+                    {% for w in range(5, 11) %}
+                    <option value="{{ w }}">{{ w }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>地图高度:</label>
+                <select id="map-height">
+                    {% for h in range(5, 16) %}
+                    <option value="{{ h }}">{{ h }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button class="btn btn-secondary" onclick="resizeMap()">调整地图尺寸</button>
+        </div>
+    </div>
+    
+    <div class="editor-main">
+        <div class="map-canvas">
+            <h3>地图编辑</h3>
+            <div id="board-container">
+                <!-- 地图网格将通过JS生成 -->
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="saveMap()">保存地图</button>
+                <button class="btn btn-secondary" onclick="exportMap()">导出地图</button>
+                <button class="btn btn-danger" onclick="deleteMap()">删除地图</button>
+                <button class="btn btn-secondary" onclick="clearMap()">清空地图</button>
+            </div>
+            
+            <div id="message" class="success-message" style="display: none;"></div>
+        </div>
+        
+        <div class="editor-tools">
+            <div class="tool-section">
+                <h3>编辑工具</h3>
+                <button class="btn btn-secondary" onclick="setEditMode('terrain')">地形编辑</button>
+                <button class="btn btn-secondary" onclick="setEditMode('piece')">棋子编辑</button>
+            </div>
+            
+            <div class="tool-section">
+                <h3>地图管理</h3>
+                <select id="map-select" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                    <option value="">选择地图</option>
+                </select>
+                <button class="btn btn-primary" onclick="loadMap()">加载地图</button>
+                <button class="btn btn-secondary" onclick="refreshMapList()">刷新列表</button>
+            </div>
+            
+            <div class="tool-section">
+        <h3>地形类型</h3>
+        <div style="margin-bottom: 10px;">
+            <select id="terrain-select" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+                <!-- 地形选项将通过JS生成 -->
+            </select>
+        </div>
+        <button class="btn btn-secondary" style="margin-top: 10px; width: 100%;" onclick="openTerrainModal()">
+            管理地形
+        </button>
+    </div>
+    
+    <div class="tool-section">
+        <h3>高度编辑</h3>
+        <div style="margin-bottom: 10px;">
+            <select id="height-select" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+                <option value="-1">高度 -1</option>
+                <option value="0">高度 0</option>
+                <option value="1">高度 1</option>
+                <option value="2">高度 2</option>
+                <option value="3">高度 3</option>
+                <option value="4">高度 4</option>
+            </select>
+        </div>
+        <button class="btn btn-secondary" style="margin-top: 10px; width: 100%;" onclick="setEditMode('height')">
+            切换到高度编辑
+        </button>
+    </div>
+            
+            <div class="tool-section">
+                <h3>棋子选择</h3>
+                <div style="margin-bottom: 10px;">
+                    <label>颜色:</label>
+                    <select id="piece-color" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                        <option value="R">红色</option>
+                        <option value="B">黑色</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label>棋子类型:</label>
+                    <select id="piece-type" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd; margin-top: 5px;">
+                        <!-- 棋子类型选项将通过JS生成 -->
+                    </select>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <button class="btn btn-primary" style="width: 100%;" onclick="selectPieceFromDropdown()">
+                        选择棋子
+                    </button>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <button class="btn btn-secondary" style="width: 100%;" onclick="selectPiece('none')">
+                        清除棋子
+                    </button>
+                </div>
+                <button class="btn btn-secondary" style="margin-top: 10px; width: 100%;" onclick="openPieceModal()">
+                    管理棋子
+                </button>
+            </div>
+            
+            <div class="tool-section">
+                <h3>当前选择</h3>
+                <div id="current-selection">
+                    编辑模式: 地形编辑<br>
+                    当前地形: 平原<br>
+                    当前棋子: 无
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 地形管理模态框 -->
+<div id="terrainModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>地形管理</h2>
+            <span class="close" onclick="closeTerrainModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="terrain-types-list">
+                <!-- 地形类型列表将通过JS生成 -->
+            </div>
+            <div style="margin-top: 20px;">
+                <h4>添加新地形</h4>
+                <div>
+                    <label>地形名称:</label>
+                    <input type="text" id="new-terrain-name" placeholder="输入地形名称">
+                </div>
+                <div>
+                    <label>地形标签:</label>
+                    <input type="text" id="new-terrain-id" placeholder="输入地形标签（如：plain）">
+                </div>
+                <div>
+                    <label>地形颜色:</label>
+                    <input type="color" id="new-terrain-color" value="#f0e6d2">
+                </div>
+                <div>
+                    <label>可通行性:</label>
+                    <select id="new-terrain-passability">
+                        <option value="1">可通行</option>
+                        <option value="0">不可通行</option>
+                    </select>
+                </div>
+                <div>
+                    <label>移动成本:</label>
+                    <input type="number" id="new-terrain-move-cost" value="1" min="1">
+                </div>
+                <div>
+                    <label>战斗加成:</label>
+                    <input type="number" id="new-terrain-combat-bonus" value="1.0" step="0.1">
+                </div>
+                <button class="btn btn-success" onclick="addTerrainType()">添加地形</button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeTerrainModal()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<!-- 工棋子高度调整模态框 -->
+<div id="workerModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>调整地形高度</h2>
+            <span class="close" onclick="closeWorkerModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>当前高度: <span id="current-height-value">0</span></p>
+            <p>选择操作:</p>
+            <div style="margin: 20px 0;">
+                <button class="btn btn-secondary" onclick="adjustHeight(1)">增加高度 (+1)</button>
+                <button class="btn btn-secondary" onclick="adjustHeight(-1)">降低高度 (-1)</button>
+            </div>
+            <p>新高度: <span id="new-height-value">0</span></p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeWorkerModal()">取消</button>
+            <button class="btn btn-success" onclick="confirmHeightAdjustment()">确认</button>
+        </div>
+    </div>
+</div>
+
+<!-- 棋子管理模态框 -->
+<div id="pieceModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>棋子管理</h2>
+            <span class="close" onclick="closePieceModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <!-- 棋子样式显示框 -->
+            <div style="margin-bottom: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9;">
+                <h4>棋子样式预览</h4>
+                <div id="piece-preview" style="display: flex; align-items: center; justify-content: center; min-height: 150px; background: #fff; border: 1px solid #ccc; border-radius: 5px;">
+                    <span style="font-size: 24px;">请选择棋子</span>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button id="edit-selected-piece" class="btn btn-secondary" onclick="editSelectedPiece()" disabled>
+                        编辑棋子
+                    </button>
+                    <button id="delete-selected-piece" class="btn btn-danger" onclick="deleteSelectedPiece()" disabled>
+                        删除棋子
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 棋子选择下拉框 -->
+            <div style="margin-bottom: 20px;">
+                <h4>选择棋子</h4>
+                <select id="piece-select" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+                    <option value="">-- 选择棋子 --</option>
+                    <!-- 棋子选项将通过JS生成 -->
+                </select>
+            </div>
+            
+            
+            <div style="margin-top: 20px;">
+                <h4>添加新棋子</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>棋子名称:</label>
+                        <input type="text" id="new-piece-name" placeholder="输入棋子名称">
+                    </div>
+                    <div class="form-group">
+                        <label>棋子ID:</label>
+                        <input type="text" id="new-piece-id" placeholder="输入棋子ID（如：S）">
+                    </div>
+                    <div class="form-group">
+                        <label>攻击类型:</label>
+                        <select id="new-piece-attack-type">
+                            <option value="melee">近战</option>
+                            <option value="ranged">远程</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>棋子描述:</label>
+                        <input type="text" id="new-piece-description" placeholder="输入棋子描述">
+                    </div>
+                    <div class="form-group">
+                        <label>棋子图片:</label>
+                        <input type="text" id="new-piece-picture" placeholder="输入棋子图片URL">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>移动范围:</label>
+                        <input type="number" id="new-piece-move-range" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>攻击范围:</label>
+                        <input type="number" id="new-piece-combat-range" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>连携范围:</label>
+                        <input type="number" id="new-piece-coop-range" value="1" min="1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>移动成本:</label>
+                        <input type="number" id="new-piece-move-cost" value="1.0" min="0.1" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>基础攻击力:</label>
+                        <input type="number" id="new-piece-base-power" value="1.0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>防守方倍率:</label>
+                        <input type="number" id="new-piece-defense-power" value="1.0" step="0.1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>攻击连携倍率:</label>
+                        <input type="number" id="new-piece-attack-coop" value="1.0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>防守连携倍率:</label>
+                        <input type="number" id="new-piece-defense-coop" value="1.0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>地形修改:</label>
+                        <select id="new-piece-terrain-change">
+                            <option value="0">无</option>
+                            <option value="1">有</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="addPieceType()">添加棋子</button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closePieceModal()">关闭</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 全局变量
+    let currentEditMode = 'terrain'; // terrain, piece, 或 height
+    let currentTerrain = 'plain';
+    let currentPiece = { type: 'none', side: '' };
+    let currentHeight = 0;
+    let workerSelectedPos = null; // 存储工棋子选中的位置
+    let workerCurrentHeight = 0; // 存储工棋子所在位置的当前高度
+    let workerNewHeight = 0; // 存储工棋子调整后的新高度
+    let mapData = {
+        map_info: {
+            name: '新地图',
+            description: '',
+            width: 8,
+            height: 8
+        },
+        terrain_types: {},
+        piece_types: {},
+        terrain: {
+            type: [],
+            height: []
+        },
+        initial_pieces: {
+            R: [],
+            B: []
+        }
+    };
+    
+    // 数据缓存
+    let dataCache = {
+        terrain_types: null,
+        piece_types: null,
+        lastFetchTime: 0
+    };
+    
+    // 从localStorage加载缓存数据
+    function loadCacheFromLocalStorage() {
+        try {
+            const cachedData = localStorage.getItem('mapEditorCache');
+            if (cachedData) {
+                const parsedData = JSON.parse(cachedData);
+                dataCache.terrain_types = parsedData.terrain_types;
+                dataCache.piece_types = parsedData.piece_types;
+                dataCache.lastFetchTime = parsedData.lastFetchTime;
+                console.log('从本地存储加载缓存数据');
+            }
+        } catch (error) {
+            console.error('从本地存储加载缓存失败:', error);
+        }
+    }
+    
+    // 将缓存数据保存到localStorage
+    function saveCacheToLocalStorage() {
+        try {
+            localStorage.setItem('mapEditorCache', JSON.stringify(dataCache));
+            console.log('缓存数据已保存到本地存储');
+        } catch (error) {
+            console.error('保存缓存到本地存储失败:', error);
+        }
+    }
+    
+    // 从数据库加载地形和棋子数据
+    async function loadDataFromDatabase() {
+        try {
+            // 每次都从数据库获取最新数据
+            // 加载地形数据
+            const terrainResponse = await fetch('/game/bo/api/get-terrain-types');
+            const terrainData = await terrainResponse.json();
+            if (terrainData.success) {
+                mapData.terrain_types = terrainData.terrain_types;
+                dataCache.terrain_types = terrainData.terrain_types;
+            }
+            
+            // 加载棋子数据
+            const pieceResponse = await fetch('/game/bo/api/get-piece-types');
+            const pieceData = await pieceResponse.json();
+            if (pieceData.success) {
+                mapData.piece_types = pieceData.piece_types;
+                dataCache.piece_types = pieceData.piece_types;
+            }
+            
+            // 更新缓存时间
+            dataCache.lastFetchTime = Date.now();
+            // 保存缓存到本地存储
+            saveCacheToLocalStorage();
+            showMessage('数据加载成功', 'success');
+            
+            // 更新UI
+            updateTerrainPalette();
+            updatePieceSelectDropdown();
+
+            updateTerrainTypesList();
+        } catch (error) {
+            console.error('加载数据失败:', error);
+            showMessage('加载数据失败: ' + error.message, 'error');
+        }
+    }
+    
+    // 初始化地图
+    async function initMap() {
+        updateMapInfoFromForm();
+        generateEmptyMap();
+        renderMap();
+        updateSelectionInfo();
+        await loadDataFromDatabase(); // 从数据库加载数据
+        updateTerrainTypesList();
+        updateTerrainPalette(); // 更新地形下拉选择框
+    }
+    
+    // 从表单更新地图信息
+    function updateMapInfoFromForm() {
+        mapData.map_info.name = document.getElementById('map-name').value;
+        mapData.map_info.description = document.getElementById('map-description').value;
+        mapData.map_info.width = parseInt(document.getElementById('map-width').value);
+        mapData.map_info.height = parseInt(document.getElementById('map-height').value);
+    }
+    
+    // 生成空地图
+    function generateEmptyMap() {
+        const width = mapData.map_info.width;
+        const height = mapData.map_info.height;
+        
+        // 初始化地形数据
+        mapData.terrain = {
+            type: [],
+            height: []
+        };
+        
+        // 初始化地形类型
+        for (let y = 0; y < height; y++) {
+            const row = [];
+            for (let x = 0; x < width; x++) {
+                row.push('plain');
+            }
+            mapData.terrain.type.push(row);
+        }
+        
+        // 初始化地形高度
+        for (let y = 0; y < height; y++) {
+            const row = [];
+            for (let x = 0; x < width; x++) {
+                row.push(0); // 默认高度为0
+            }
+            mapData.terrain.height.push(row);
+        }
+        
+        // 清空初始棋子
+        mapData.initial_pieces = {
+            R: [],
+            B: []
+        };
+    }
+    
+    // 渲染地图
+    function renderMap() {
+        const container = document.getElementById('board-container');
+        const width = mapData.map_info.width;
+        const height = mapData.map_info.height;
+        
+        // 清空容器
+        container.innerHTML = '';
+        
+        // 创建地图网格
+        const grid = document.createElement('div');
+        grid.className = 'board-grid';
+        grid.style.gridTemplateColumns = `repeat(${width}, 50px)`;
+        grid.style.gridTemplateRows = `repeat(${height}, 50px)`;
+        
+        // 创建单元格
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const cell = document.createElement('div');
+                    const terrainType = mapData.terrain.type[y][x];
+                    const terrainInfo = mapData.terrain_types[terrainType];
+                    const terrainColor = terrainInfo?.color || '#f0e6d2';
+                    
+                    cell.className = `board-cell ${terrainType}`;
+                    cell.dataset.x = x;
+                    cell.dataset.y = y;
+                    cell.style.backgroundColor = terrainColor;
+                    
+                    // 添加地形标记
+                    const terrainMarker = document.createElement('div');
+                    terrainMarker.className = 'cell-terrain';
+                    terrainMarker.textContent = terrainType.substring(0, 2);
+                    cell.appendChild(terrainMarker);
+                    
+                    // 添加高度标记
+                    const heightMarker = document.createElement('div');
+                    heightMarker.className = 'cell-height';
+                    heightMarker.textContent = `H:${mapData.terrain.height[y][x]}`;
+                    cell.appendChild(heightMarker);
+                
+                // 检查是否有棋子
+                let piece = null;
+                // 确保initial_pieces对象存在
+                if (!mapData.initial_pieces) {
+                    mapData.initial_pieces = { R: [], B: [] };
+                }
+                // 确保R和B数组存在
+                if (!mapData.initial_pieces.R) {
+                    mapData.initial_pieces.R = [];
+                }
+                if (!mapData.initial_pieces.B) {
+                    mapData.initial_pieces.B = [];
+                }
+                // 检查红方棋子
+                for (const p of mapData.initial_pieces.R) {
+                    if (p.x === x && p.y === y) {
+                        piece = { ...p, side: 'R' };
+                        break;
+                    }
+                }
+                // 检查黑方棋子
+                if (!piece) {
+                    for (const p of mapData.initial_pieces.B) {
+                        if (p.x === x && p.y === y) {
+                            piece = { ...p, side: 'B' };
+                            break;
+                        }
+                    }
+                }
+                
+                // 添加棋子
+                if (piece) {
+                    const pieceElement = document.createElement('div');
+                    pieceElement.className = 'cell-piece';
+                    pieceElement.textContent = piece.side === 'R' ? '🔴' : '⚫';
+                    pieceElement.title = `${piece.side === 'R' ? '红' : '黑'}${getPieceName(piece.type)}`;
+                    cell.appendChild(pieceElement);
+                }
+                
+                // 添加坐标
+                const coords = document.createElement('div');
+                coords.className = 'cell-coords';
+                coords.textContent = `${x},${y}`;
+                cell.appendChild(coords);
+                
+                // 添加点击事件
+                cell.addEventListener('click', function() {
+                    handleCellClick(x, y);
+                });
+                
+                grid.appendChild(cell);
+            }
+        }
+        
+        container.appendChild(grid);
+    }
+    
+    // 处理单元格点击
+    function handleCellClick(x, y) {
+        // 检查是否点击了工棋子
+        if (currentEditMode === 'piece' && currentPiece.type === 'none') {
+            // 检查点击位置是否有工棋子
+            let workerPiece = null;
+            // 检查红方工棋子
+            for (const p of mapData.initial_pieces.R) {
+                if (p.x === x && p.y === y && p.type === 'G') {
+                    workerPiece = { ...p, side: 'R' };
+                    break;
+                }
+            }
+            // 检查黑方工棋子
+            if (!workerPiece) {
+                for (const p of mapData.initial_pieces.B) {
+                    if (p.x === x && p.y === y && p.type === 'G') {
+                        workerPiece = { ...p, side: 'B' };
+                        break;
+                    }
+                }
+            }
+            
+            // 如果点击的是工棋子，弹出高度调整模态框
+            if (workerPiece) {
+                openWorkerModal(x, y);
+                return;
+            }
+        }
+        
+        if (currentEditMode === 'terrain') {
+            // 更新地形
+            mapData.terrain.type[y][x] = currentTerrain;
+        } else if (currentEditMode === 'height') {
+            // 更新地形高度
+            mapData.terrain.height[y][x] = currentHeight;
+        } else if (currentEditMode === 'piece') {
+            // 处理棋子
+            if (currentPiece.type === 'none') {
+                // 移除棋子
+                mapData.initial_pieces.R = mapData.initial_pieces.R.filter(p => !(p.x === x && p.y === y));
+                mapData.initial_pieces.B = mapData.initial_pieces.B.filter(p => !(p.x === x && p.y === y));
+            } else {
+                // 移除旧棋子
+                mapData.initial_pieces.R = mapData.initial_pieces.R.filter(p => !(p.x === x && p.y === y));
+                mapData.initial_pieces.B = mapData.initial_pieces.B.filter(p => !(p.x === x && p.y === y));
+                
+                // 添加新棋子
+                if (currentPiece.side) {
+                    mapData.initial_pieces[currentPiece.side].push({
+                        type: currentPiece.type,
+                        x: x,
+                        y: y
+                    });
+                }
+            }
+        }
+        
+        // 重新渲染地图
+        renderMap();
+        // 显示调试信息
+        console.log('Cell clicked:', x, y);
+        console.log('Current edit mode:', currentEditMode);
+        if (currentEditMode === 'height') {
+            console.log('Current height:', currentHeight);
+            console.log('Height data:', mapData.terrain.height);
+        } else if (currentEditMode === 'piece') {
+            console.log('Current piece:', currentPiece);
+            console.log('Initial pieces:', mapData.initial_pieces);
+        }
+    }
+    
+    // 设置编辑模式
+    function setEditMode(mode) {
+        currentEditMode = mode;
+        updateSelectionInfo();
+    }
+    
+    // 选择地形
+    function selectTerrain(terrain) {
+        currentTerrain = terrain;
+        // 更新下拉选择框
+        const terrainSelect = document.getElementById('terrain-select');
+        if (terrainSelect) {
+            terrainSelect.value = terrain;
+        }
+        updateSelectionInfo();
+    }
+    
+    // 选择高度
+    function selectHeight(height) {
+        currentHeight = height;
+        // 更新下拉选择框
+        const heightSelect = document.getElementById('height-select');
+        if (heightSelect) {
+            heightSelect.value = height;
+        }
+        updateSelectionInfo();
+    }
+    
+    // 初始化高度选择下拉框
+    function initHeightSelect() {
+        const heightSelect = document.getElementById('height-select');
+        if (heightSelect) {
+            heightSelect.value = currentHeight;
+            heightSelect.onchange = function() {
+                selectHeight(parseInt(this.value));
+            };
+        }
+    }
+    
+    // 选择棋子
+    function selectPiece(type, side = '') {
+        currentPiece = { type, side };
+        // 更新UI
+        document.querySelectorAll('.piece-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        if (side) {
+            const element = document.querySelector(`.piece-item[data-type="${type}"][data-side="${side}"]`);
+            if (element) {
+                element.classList.add('active');
+            }
+        } else {
+            const element = document.querySelector(`.piece-item[data-type="${type}"]`);
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+        updateSelectionInfo();
+        // 显示调试信息
+        console.log('Piece selected:', currentPiece);
+    }
+    
+    // 更新选择信息
+    function updateSelectionInfo() {
+        const info = document.getElementById('current-selection');
+        let pieceInfo = '无';
+        if (currentPiece.type !== 'none' && currentPiece.side) {
+            pieceInfo = `${currentPiece.side === 'R' ? '红' : '黑'}${getPieceName(currentPiece.type)}`;
+        }
+        
+        let modeText = '地形编辑';
+        if (currentEditMode === 'piece') {
+            modeText = '棋子编辑';
+        } else if (currentEditMode === 'height') {
+            modeText = '高度编辑';
+        }
+        
+        info.innerHTML = `
+            编辑模式: ${modeText}<br>
+            ${currentEditMode === 'terrain' ? `当前地形: ${getTerrainName(currentTerrain)}<br>` : ''}
+            ${currentEditMode === 'height' ? `当前高度: ${currentHeight}<br>` : ''}
+            当前棋子: ${pieceInfo}
+        `;
+    }
+    
+    // 获取地形名称
+    function getTerrainName(terrainType) {
+        return mapData.terrain_types[terrainType]?.name || terrainType;
+    }
+    
+    // 获取棋子名称
+    function getPieceName(pieceType) {
+        return mapData.piece_types[pieceType]?.name || pieceType;
+    }
+    
+    // 调整地图尺寸
+    function resizeMap() {
+        updateMapInfoFromForm();
+        generateEmptyMap();
+        renderMap();
+        showMessage('地图尺寸已调整', 'success');
+    }
+    
+    // 加载默认地图
+    function loadDefaultMap() {
+        // 默认地图数据
+        const defaultMap = {
+            map_info: {
+                name: '默认战场',
+                description: '标准8x8战场',
+                width: 8,
+                height: 8
+            },
+            terrain_types: {
+                plain: {
+                    name: '平原',
+                    passability: 1,
+                    move_cost: 1,
+                    combat_bonus: 1.0
+                },
+                mountain: {
+                    name: '山地',
+                    passability: 1,
+                    move_cost: 2,
+                    combat_bonus: 1.2
+                },
+                water: {
+                    name: '水域',
+                    passability: 0,
+                    move_cost: 999,
+                    combat_bonus: 0.8
+                }
+            },
+            piece_types: {
+                S: {
+                    name: '散兵',
+                    description: '基础步兵单位',
+                    move_range: 1,
+                    combat_range: 1,
+                    base_power: 1.0
+                },
+                T: {
+                    name: '弓箭手',
+                    description: '远程攻击单位',
+                    move_range: 1,
+                    combat_range: 3,
+                    base_power: 0.9
+                },
+                X: {
+                    name: '枭',
+                    description: '核心单位，被击败则游戏结束',
+                    move_range: 1,
+                    combat_range: 1,
+                    base_power: 1.3
+                }
+            },
+            terrain: {
+                type: [
+                    ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+                    ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+                    ["plain", "plain", "mountain", "mountain", "mountain", "mountain", "plain", "plain"],
+                    ["plain", "plain", "mountain", "water", "water", "mountain", "plain", "plain"],
+                    ["plain", "plain", "mountain", "water", "water", "mountain", "plain", "plain"],
+                    ["plain", "plain", "mountain", "mountain", "mountain", "mountain", "plain", "plain"],
+                    ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"],
+                    ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain"]
+                ],
+                height: [
+                    [0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 1, 1, 1, 1, 0, 0],
+                    [0, 0, 1, 0, 0, 1, 0, 0],
+                    [0, 0, 1, 0, 0, 1, 0, 0],
+                    [0, 0, 1, 1, 1, 1, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0]
+                ]
+            },
+            initial_pieces: {
+                R: [
+                    {"type": "S", "x": 0, "y": 0},
+                    {"type": "S", "x": 1, "y": 0},
+                    {"type": "T", "x": 2, "y": 0},
+                    {"type": "X", "x": 3, "y": 0},
+                    {"type": "T", "x": 4, "y": 0},
+                    {"type": "S", "x": 5, "y": 0},
+                    {"type": "S", "x": 6, "y": 0}
+                ],
+                B: [
+                    {"type": "S", "x": 0, "y": 7},
+                    {"type": "S", "x": 1, "y": 7},
+                    {"type": "T", "x": 2, "y": 7},
+                    {"type": "X", "x": 3, "y": 7},
+                    {"type": "T", "x": 4, "y": 7},
+                    {"type": "S", "x": 5, "y": 7},
+                    {"type": "S", "x": 6, "y": 7}
+                ]
+            }
+        };
+        
+        // 加载默认地图
+        mapData = defaultMap;
+        
+        // 更新表单
+        document.getElementById('map-name').value = mapData.map_info.name;
+        document.getElementById('map-description').value = mapData.map_info.description;
+        document.getElementById('map-width').value = mapData.map_info.width;
+        document.getElementById('map-height').value = mapData.map_info.height;
+        
+        // 重新渲染
+        renderMap();
+        updateSelectionInfo();
+        updateTerrainTypesList();
+        showMessage('默认地图已加载', 'success');
+    }
+    
+    // 保存地图
+    function saveMap() {
+        updateMapInfoFromForm();
+        
+        // 构建保存数据
+        const mapName = mapData.map_info.name || 'unnamed';
+        const safeMapName = mapName.replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
+        
+        // 发送保存请求
+        fetch('/game/bo/api/save-map', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                map_name: safeMapName,
+                map_data: mapData
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('地图保存成功', 'success');
+            } else {
+                showMessage('地图保存失败: ' + data.msg, 'error');
+            }
+        })
+        .catch(error => {
+            showMessage('保存失败: ' + error.message, 'error');
+        });
+    }
+    
+    // 导出地图
+    function exportMap() {
+        updateMapInfoFromForm();
+        
+        // 创建JSON字符串
+        const jsonStr = JSON.stringify(mapData, null, 2);
+        
+        // 创建下载链接
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${mapData.map_info.name || 'map'}.json`;
+        a.click();
+        
+        // 清理
+        URL.revokeObjectURL(url);
+        showMessage('地图已导出', 'success');
+    }
+    
+    // 清空地图
+    function clearMap() {
+        if (confirm('确定要清空地图吗？')) {
+            generateEmptyMap();
+            renderMap();
+            showMessage('地图已清空', 'success');
+        }
+    }
+    
+    // 删除地图
+    function deleteMap() {
+        // 获取当前地图名称
+        const currentMapName = localStorage.getItem('currentMapName');
+        if (!currentMapName) {
+            showMessage('没有可删除的地图', 'error');
+            return;
+        }
+        
+        if (confirm(`确定要删除地图 "${currentMapName}" 吗？`)) {
+            // 发送删除请求
+            fetch(`/game/bo/api/delete-map/${currentMapName}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 清除本地存储的地图名称
+                    localStorage.removeItem('currentMapName');
+                    // 初始化空地图
+                    initMap();
+                    // 刷新地图列表
+                    refreshMapList();
+                    showMessage('地图删除成功', 'success');
+                } else {
+                    showMessage('删除地图失败: ' + data.msg, 'error');
+                }
+            })
+            .catch(error => {
+                showMessage('删除失败: ' + error.message, 'error');
+            });
+        }
+    }
+    
+    // 显示消息
+    function showMessage(text, type = 'success') {
+        const message = document.getElementById('message');
+        message.textContent = text;
+        message.className = type === 'success' ? 'success-message' : 'error-message';
+        message.style.display = 'block';
+        
+        // 3秒后隐藏
+        setTimeout(() => {
+            message.style.display = 'none';
+        }, 3000);
+    }
+    
+    // 打开地形管理模态框
+    async function openTerrainModal() {
+        document.getElementById('terrainModal').style.display = 'block';
+        // 每次都从数据库获取最新数据
+        await loadDataFromDatabase();
+        updateTerrainTypesList();
+    }
+    
+    // 关闭地形管理模态框
+    function closeTerrainModal() {
+        document.getElementById('terrainModal').style.display = 'none';
+    }
+    
+    // 更新地形类型列表
+    function updateTerrainTypesList() {
+        const list = document.getElementById('terrain-types-list');
+        list.innerHTML = '';
+        
+        for (const [id, info] of Object.entries(mapData.terrain_types)) {
+            const color = info.color || '#f0e6d2';
+            const item = document.createElement('div');
+            item.className = 'type-item';
+            item.innerHTML = `
+                <div>
+                    <strong>${info.name}</strong> (${id})<br>
+                    颜色: <span style="display: inline-block; width: 15px; height: 15px; background-color: ${color}; border: 1px solid #ccc;"></span><br>
+                    可通行: ${info.passability ? '是' : '否'}<br>
+                    移动成本: ${info.move_cost}<br>
+                    战斗加成: ${info.combat_bonus}x
+                </div>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn btn-secondary" onclick="editTerrainType('${id}')" style="padding: 5px 10px; font-size: 12px;">
+                        编辑
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteTerrainType('${id}')" style="padding: 5px 10px; font-size: 12px;">
+                        删除
+                    </button>
+                </div>
+            `;
+            list.appendChild(item);
+        }
+    }
+    
+    // 生成唯一的地形ID
+    function generateTerrainId(name) {
+        // 将名称转换为小写，移除特殊字符，替换空格为下划线
+        let id = name.toLowerCase()
+            .replace(/[^a-z0-9\s]/g, '')
+            .replace(/\s+/g, '_');
+        
+        // 确保ID不为空
+        if (!id) {
+            id = 'terrain_' + Date.now();
+        }
+        
+        // 确保ID唯一
+        let originalId = id;
+        let counter = 1;
+        while (id in mapData.terrain_types) {
+            id = originalId + '_' + counter;
+            counter++;
+        }
+        
+        return id;
+    }
+    
+    // 添加或编辑地形类型
+    function addTerrainType() {
+        const name = document.getElementById('new-terrain-name').value.trim();
+        const terrainId = document.getElementById('new-terrain-id').value.trim();
+        const color = document.getElementById('new-terrain-color').value;
+        const passability = parseInt(document.getElementById('new-terrain-passability').value);
+        const moveCost = parseInt(document.getElementById('new-terrain-move-cost').value);
+        const combatBonus = parseFloat(document.getElementById('new-terrain-combat-bonus').value);
+        
+        if (!name) {
+            showMessage('请输入地形名称', 'error');
+            return;
+        }
+        
+        if (!window.editingTerrainId && !terrainId) {
+            showMessage('请输入地形标签', 'error');
+            return;
+        }
+        
+        if (window.editingTerrainId) {
+            // 编辑现有地形
+            const id = window.editingTerrainId;
+            mapData.terrain_types[id] = {
+                name: name,
+                color: color,
+                passability: passability,
+                move_cost: moveCost,
+                combat_bonus: combatBonus
+            };
+            
+            // 清除编辑状态
+            window.editingTerrainId = null;
+            showMessage('地形类型更新成功', 'success');
+            
+            // 更新地形面板
+            updateTerrainPalette();
+        } else {
+            // 添加新地形
+            // 检查地形标签是否已存在
+            if (terrainId in mapData.terrain_types) {
+                showMessage('地形标签已存在，请使用其他标签', 'error');
+                return;
+            }
+            
+            // 添加新地形
+            mapData.terrain_types[terrainId] = {
+                name: name,
+                color: color,
+                passability: passability,
+                move_cost: moveCost,
+                combat_bonus: combatBonus
+            };
+            
+            // 在地形选择面板中添加新的选择框
+            addTerrainToPalette(terrainId, name, color);
+            
+            showMessage('地形类型添加成功', 'success');
+        }
+        
+        // 更新列表
+        updateTerrainTypesList();
+        
+        // 清空表单
+        document.getElementById('new-terrain-name').value = '';
+        document.getElementById('new-terrain-id').value = '';
+        document.getElementById('new-terrain-id').disabled = false; // 重新启用标签输入
+        document.getElementById('new-terrain-color').value = '#f0e6d2';
+        document.getElementById('new-terrain-passability').value = '1';
+        document.getElementById('new-terrain-move-cost').value = '1';
+        document.getElementById('new-terrain-combat-bonus').value = '1.0';
+        
+        // 同步到数据库
+        syncTerrainDataToDatabase();
+    }
+    
+    // 编辑地形类型
+    function editTerrainType(terrainId) {
+        const terrain = mapData.terrain_types[terrainId];
+        if (!terrain) {
+            showMessage('地形不存在', 'error');
+            return;
+        }
+        
+        // 填充表单
+        document.getElementById('new-terrain-name').value = terrain.name;
+        document.getElementById('new-terrain-id').value = terrainId;
+        document.getElementById('new-terrain-id').disabled = true; // 编辑时禁用标签修改
+        document.getElementById('new-terrain-color').value = terrain.color || '#f0e6d2';
+        document.getElementById('new-terrain-passability').value = terrain.passability;
+        document.getElementById('new-terrain-move-cost').value = terrain.move_cost;
+        document.getElementById('new-terrain-combat-bonus').value = terrain.combat_bonus;
+        
+        // 保存当前编辑的地形ID
+        window.editingTerrainId = terrainId;
+        
+        // 显示编辑提示
+        showMessage(`正在编辑地形: ${terrain.name}`, 'success');
+    }
+    
+    // 在地形选择下拉框中添加新的地形选项
+    function addTerrainToPalette(terrainId, terrainName, terrainColor) {
+        // 直接调用更新函数来刷新整个下拉框
+        updateTerrainPalette();
+    }
+    
+    // 删除地形类型
+    async function deleteTerrainType(terrainId) {
+        if (terrainId === 'plain') {
+            showMessage('不能删除平原地形', 'error');
+            return;
+        }
+        
+        if (confirm(`确定要删除地形 ${mapData.terrain_types[terrainId].name} 吗？`)) {
+            try {
+                // 调用API删除地形
+                const response = await fetch('/game/bo/api/delete-terrain', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        terrain_id: terrainId
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    // 从本地数据中删除
+                    delete mapData.terrain_types[terrainId];
+                    
+                    // 将所有使用该地形的格子改为平原
+                    for (let y = 0; y < mapData.terrain.type.length; y++) {
+                        for (let x = 0; x < mapData.terrain.type[y].length; x++) {
+                            if (mapData.terrain.type[y][x] === terrainId) {
+                                mapData.terrain.type[y][x] = 'plain';
+                            }
+                        }
+                    }
+                    
+                    // 更新列表、地图和地形面板
+                    updateTerrainTypesList();
+                    updateTerrainPalette(); // 更新地形面板
+                    renderMap();
+                    showMessage('地形类型已删除', 'success');
+                    // 清除缓存
+                    dataCache.terrain_types = null;
+                    dataCache.lastFetchTime = 0;
+                } else {
+                    showMessage('删除地形失败: ' + data.msg, 'error');
+                }
+            } catch (error) {
+                console.error('删除地形失败:', error);
+                showMessage('删除地形失败: ' + error.message, 'error');
+            }
+        }
+    }
+    
+    // 打开工棋子高度调整模态框
+    function openWorkerModal(x, y) {
+        workerSelectedPos = { x, y };
+        workerCurrentHeight = mapData.terrain.height[y][x];
+        workerNewHeight = workerCurrentHeight;
+        
+        // 更新模态框中的高度显示
+        document.getElementById('current-height-value').textContent = workerCurrentHeight;
+        document.getElementById('new-height-value').textContent = workerNewHeight;
+        
+        // 显示模态框
+        document.getElementById('workerModal').style.display = 'block';
+    }
+    
+    // 关闭工棋子高度调整模态框
+    function closeWorkerModal() {
+        document.getElementById('workerModal').style.display = 'none';
+        workerSelectedPos = null;
+        workerCurrentHeight = 0;
+        workerNewHeight = 0;
+    }
+    
+    // 调整高度
+    function adjustHeight(delta) {
+        workerNewHeight += delta;
+        // 确保高度在合理范围内
+        workerNewHeight = Math.max(-1, Math.min(4, workerNewHeight));
+        document.getElementById('new-height-value').textContent = workerNewHeight;
+    }
+    
+    // 确认高度调整
+    function confirmHeightAdjustment() {
+        if (workerSelectedPos) {
+            const { x, y } = workerSelectedPos;
+            // 更新地形高度
+            mapData.terrain.height[y][x] = workerNewHeight;
+            
+            // 移除工棋子
+            mapData.initial_pieces.R = mapData.initial_pieces.R.filter(p => !(p.x === x && p.y === y));
+            mapData.initial_pieces.B = mapData.initial_pieces.B.filter(p => !(p.x === x && p.y === y));
+            
+            // 重新渲染地图
+            renderMap();
+            showMessage('地形高度已调整，工棋子已消失', 'success');
+            
+            // 关闭模态框
+            closeWorkerModal();
+        }
+    }
+    
+    // 打开棋子管理模态框
+    function openPieceModal() {
+        document.getElementById('pieceModal').style.display = 'block';
+
+        updatePieceSelectDropdown();
+    }
+    
+    // 关闭棋子管理模态框
+    function closePieceModal() {
+        document.getElementById('pieceModal').style.display = 'none';
+        // 清空表单
+        document.getElementById('new-piece-name').value = '';
+        document.getElementById('new-piece-id').value = '';
+        document.getElementById('new-piece-description').value = '';
+        document.getElementById('new-piece-move-range').value = '1';
+        document.getElementById('new-piece-combat-range').value = '1';
+        document.getElementById('new-piece-move-cost').value = '1';
+        document.getElementById('new-piece-base-power').value = '1.0';
+        document.getElementById('new-piece-defense-power').value = '1.0';
+        document.getElementById('new-piece-attack-coop').value = '1.0';
+        document.getElementById('new-piece-defense-coop').value = '1.0';
+        document.getElementById('new-piece-attack-type').value = 'melee';
+        document.getElementById('new-piece-coop-range').value = '1';
+        document.getElementById('new-piece-picture').value = '';
+        document.getElementById('new-piece-terrain-change').value = '0';
+        // 清除编辑状态
+        window.editingPieceId = null;
+    }
+    
+
+    
+    // 编辑棋子类型
+    function editPieceType(pieceId) {
+        const piece = mapData.piece_types[pieceId];
+        if (!piece) {
+            showMessage('棋子不存在', 'error');
+            return;
+        }
+        
+        // 填充表单
+        document.getElementById('new-piece-name').value = piece.name;
+        document.getElementById('new-piece-id').value = pieceId;
+        document.getElementById('new-piece-id').disabled = true; // 编辑时禁用ID修改
+        document.getElementById('new-piece-description').value = piece.description;
+        document.getElementById('new-piece-move-range').value = piece.move_range;
+        document.getElementById('new-piece-combat-range').value = piece.combat_range;
+        document.getElementById('new-piece-move-cost').value = piece.move_cost || 1;
+        document.getElementById('new-piece-base-power').value = piece.base_power;
+        document.getElementById('new-piece-defense-power').value = piece.defense_power || 1.0;
+        document.getElementById('new-piece-attack-coop').value = piece.attack_coop || 1.0;
+        document.getElementById('new-piece-defense-coop').value = piece.defense_coop || 1.0;
+        document.getElementById('new-piece-attack-type').value = piece.attack_type;
+        document.getElementById('new-piece-coop-range').value = piece.coop_range || 1;
+        document.getElementById('new-piece-picture').value = piece.piece_picture || '';
+        document.getElementById('new-piece-terrain-change').value = piece.terrain_change || 0;
+        
+        // 保存当前编辑的棋子ID
+        window.editingPieceId = pieceId;
+        
+        // 显示编辑提示
+        showMessage(`正在编辑棋子: ${piece.name}`, 'success');
+    }
+    
+    // 添加或编辑棋子类型
+    function addPieceType() {
+        const name = document.getElementById('new-piece-name').value.trim();
+        const pieceId = document.getElementById('new-piece-id').value.trim();
+        const description = document.getElementById('new-piece-description').value.trim();
+        const moveRange = parseInt(document.getElementById('new-piece-move-range').value);
+        const combatRange = parseInt(document.getElementById('new-piece-combat-range').value);
+        const moveCost = parseFloat(document.getElementById('new-piece-move-cost').value);
+        const basePower = parseFloat(document.getElementById('new-piece-base-power').value);
+        const defensePower = parseFloat(document.getElementById('new-piece-defense-power').value);
+        const attackCoop = parseFloat(document.getElementById('new-piece-attack-coop').value);
+        const defenseCoop = parseFloat(document.getElementById('new-piece-defense-coop').value);
+        const attackType = document.getElementById('new-piece-attack-type').value;
+        const coopRange = parseInt(document.getElementById('new-piece-coop-range').value);
+        const piecePicture = document.getElementById('new-piece-picture').value.trim();
+        const terrainChange = parseInt(document.getElementById('new-piece-terrain-change').value);
+        
+        if (!name) {
+            showMessage('请输入棋子名称', 'error');
+            return;
+        }
+        
+        if (!window.editingPieceId && !pieceId) {
+            showMessage('请输入棋子ID', 'error');
+            return;
+        }
+        
+        if (window.editingPieceId) {
+            // 编辑现有棋子
+            const id = window.editingPieceId;
+            mapData.piece_types[id] = {
+                name: name,
+                description: description,
+                move_range: moveRange,
+                combat_range: combatRange,
+                move_cost: moveCost,
+                base_power: basePower,
+                defense_power: defensePower,
+                attack_coop: attackCoop,
+                defense_coop: defenseCoop,
+                attack_type: attackType,
+                coop_range: coopRange,
+                piece_picture: piecePicture,
+                terrain_change: terrainChange
+            };
+            
+            // 清除编辑状态
+            window.editingPieceId = null;
+            showMessage('棋子类型更新成功', 'success');
+        } else {
+            // 添加新棋子
+            // 检查棋子ID是否已存在
+            if (pieceId in mapData.piece_types) {
+                showMessage('棋子ID已存在，请使用其他ID', 'error');
+                return;
+            }
+            
+            // 添加新棋子
+            mapData.piece_types[pieceId] = {
+                name: name,
+                description: description,
+                move_range: moveRange,
+                combat_range: combatRange,
+                move_cost: moveCost,
+                base_power: basePower,
+                defense_power: defensePower,
+                attack_coop: attackCoop,
+                defense_coop: defenseCoop,
+                attack_type: attackType,
+                coop_range: coopRange,
+                piece_picture: piecePicture,
+                terrain_change: terrainChange
+            };
+            
+            showMessage('棋子类型添加成功', 'success');
+        }
+        
+        
+        // 更新棋子类型下拉框
+        updatePieceTypeDropdown();
+        // 更新棋子管理模态框中的棋子选择下拉框
+        updatePieceSelectDropdown();
+        // 同步到数据库
+        syncPieceDataToDatabase();
+        
+        // 清空表单
+        document.getElementById('new-piece-name').value = '';
+        document.getElementById('new-piece-id').value = '';
+        document.getElementById('new-piece-id').disabled = false;
+        document.getElementById('new-piece-description').value = '';
+        document.getElementById('new-piece-move-range').value = '1';
+        document.getElementById('new-piece-combat-range').value = '1';
+        document.getElementById('new-piece-move-cost').value = '1';
+        document.getElementById('new-piece-base-power').value = '1.0';
+        document.getElementById('new-piece-defense-power').value = '1.0';
+        document.getElementById('new-piece-attack-coop').value = '1.0';
+        document.getElementById('new-piece-defense-coop').value = '1.0';
+        document.getElementById('new-piece-attack-type').value = 'melee';
+        document.getElementById('new-piece-coop-range').value = '1';
+        document.getElementById('new-piece-picture').value = '';
+        document.getElementById('new-piece-terrain-change').value = '0';
+    }
+    
+    // 将棋子数据同步到数据库
+    async function syncPieceDataToDatabase() {
+        try {
+            // 遍历所有棋子类型，同步到数据库
+            for (const [id, data] of Object.entries(mapData.piece_types)) {
+                await fetch('/game/bo/api/update-piece', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        piece_id: id,
+                        piece_data: data
+                    })
+                });
+            }
+            
+            // 清除缓存，下次加载时重新获取
+            dataCache.piece_types = null;
+            dataCache.lastFetchTime = 0;
+            
+            // 重新加载数据以确保一致性
+            await loadDataFromDatabase();
+            showMessage('棋子数据已同步到数据库', 'success');
+        } catch (error) {
+            console.error('同步棋子数据失败:', error);
+            showMessage('同步棋子数据失败: ' + error.message, 'error');
+        }
+    }
+    
+    // 将地形数据同步到数据库
+    async function syncTerrainDataToDatabase() {
+        try {
+            // 遍历所有地形类型，同步到数据库
+            for (const [id, data] of Object.entries(mapData.terrain_types)) {
+                await fetch('/game/bo/api/update-terrain', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        terrain_id: id,
+                        terrain_data: data
+                    })
+                });
+            }
+            
+            // 清除缓存，下次加载时重新获取
+            dataCache.terrain_types = null;
+            dataCache.lastFetchTime = 0;
+            
+            // 重新加载数据以确保一致性
+            await loadDataFromDatabase();
+            showMessage('地形数据已同步到数据库', 'success');
+        } catch (error) {
+            console.error('同步地形数据失败:', error);
+            showMessage('同步地形数据失败: ' + error.message, 'error');
+        }
+    }
+    
+    // 删除棋子类型
+    async function deletePieceType(pieceId) {
+        // 不能删除核心棋子类型
+        if (pieceId === 'X') {
+            showMessage('不能删除枭棋子', 'error');
+            return;
+        }
+        
+        if (confirm(`确定要删除棋子 ${mapData.piece_types[pieceId].name} 吗？`)) {
+            try {
+                // 调用API删除棋子
+                const response = await fetch('/game/bo/api/delete-piece', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        piece_id: pieceId
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    // 从本地数据中删除
+                    delete mapData.piece_types[pieceId];
+                    
+                    // 更新列表
+                    updatePieceTypesList();
+                    // 更新棋子类型下拉框
+                    updatePieceTypeDropdown();
+                    // 更新棋子管理模态框中的棋子选择下拉框
+                    updatePieceSelectDropdown();
+                    showMessage('棋子类型已删除', 'success');
+                    // 清除缓存
+                    dataCache.piece_types = null;
+                    dataCache.lastFetchTime = 0;
+                } else {
+                    showMessage('删除棋子失败: ' + data.msg, 'error');
+                }
+            } catch (error) {
+                console.error('删除棋子失败:', error);
+                showMessage('删除棋子失败: ' + error.message, 'error');
+            }
+        }
+    }
+    
+    // 编辑选中的棋子
+    function editSelectedPiece() {
+        if (window.selectedPieceId) {
+            editPieceType(window.selectedPieceId);
+        }
+    }
+    
+    // 删除选中的棋子
+    function deleteSelectedPiece() {
+        if (window.selectedPieceId) {
+            deletePieceType(window.selectedPieceId);
+            // 重置预览
+            updatePiecePreview('');
+            // 重置选中状态
+            window.selectedPieceId = null;
+        }
+    }
+    
+    // 点击模态框外部关闭
+    window.onclick = function(event) {
+        const terrainModal = document.getElementById('terrainModal');
+        const workerModal = document.getElementById('workerModal');
+        const pieceModal = document.getElementById('pieceModal');
+        if (event.target == terrainModal) {
+            terrainModal.style.display = 'none';
+        }
+        if (event.target == workerModal) {
+            workerModal.style.display = 'none';
+        }
+        if (event.target == pieceModal) {
+            pieceModal.style.display = 'none';
+        }
+    };
+    
+    // 刷新地图列表
+    function refreshMapList() {
+        fetch('/game/bo/api/get-maps')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const select = document.getElementById('map-select');
+                select.innerHTML = '<option value="">选择地图</option>';
+                
+                data.maps.forEach(map => {
+                    const option = document.createElement('option');
+                    option.value = map.name;
+                    option.textContent = map.name;
+                    select.appendChild(option);
+                });
+                
+                showMessage('地图列表已更新', 'success');
+            } else {
+                showMessage('获取地图列表失败: ' + data.msg, 'error');
+            }
+        })
+        .catch(error => {
+            showMessage('刷新地图列表失败: ' + error.message, 'error');
+        });
+    }
+    
+    // 更新地形下拉选择框
+    function updateTerrainPalette() {
+        const terrainSelect = document.getElementById('terrain-select');
+        if (!terrainSelect) return;
+        
+        // 清空选择框
+        terrainSelect.innerHTML = '';
+        
+        // 为每个地形类型添加选项
+        for (const [id, info] of Object.entries(mapData.terrain_types)) {
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = info.name;
+            if (id === currentTerrain) {
+                option.selected = true;
+            }
+            terrainSelect.appendChild(option);
+        }
+        
+        // 添加选择事件监听
+        terrainSelect.onchange = function() {
+            selectTerrain(this.value);
+        };
+    }
+    
+    // 加载选中的地图
+    function loadMap() {
+        const mapName = document.getElementById('map-select').value;
+        if (!mapName) {
+            showMessage('请选择要加载的地图', 'error');
+            return;
+        }
+        
+        // 保存当前的地形类型和棋子类型数据
+        const currentTerrainTypes = {...mapData.terrain_types};
+        const currentPieceTypes = {...mapData.piece_types};
+        
+        fetch(`/game/bo/api/load-map/${mapName}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                mapData = data.map_data;
+                
+                // 恢复完整的地形类型和棋子类型数据
+                mapData.terrain_types = currentTerrainTypes;
+                mapData.piece_types = currentPieceTypes;
+                
+                // 更新表单
+                document.getElementById('map-name').value = mapData.map_info.name;
+                document.getElementById('map-description').value = mapData.map_info.description;
+                document.getElementById('map-width').value = mapData.map_info.width;
+                document.getElementById('map-height').value = mapData.map_info.height;
+                
+                // 重新渲染
+                renderMap();
+                updateSelectionInfo();
+                updateTerrainTypesList();
+                updateTerrainPalette(); // 更新地形面板
+                showMessage('地图加载成功', 'success');
+            } else {
+                showMessage('加载地图失败: ' + data.msg, 'error');
+            }
+        })
+        .catch(error => {
+            showMessage('加载地图失败: ' + error.message, 'error');
+        });
+    }
+    
+    // 更新棋子类型下拉框
+    function updatePieceTypeDropdown() {
+        const pieceTypeSelect = document.getElementById('piece-type');
+        if (!pieceTypeSelect) return;
+        
+        // 清空下拉框
+        pieceTypeSelect.innerHTML = '';
+        
+        // 添加棋子类型选项
+        for (const [id, info] of Object.entries(mapData.piece_types)) {
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = info.name;
+            pieceTypeSelect.appendChild(option);
+        }
+    }
+    
+    // 更新棋子管理模态框中的棋子选择下拉框
+    function updatePieceSelectDropdown() {
+        const pieceSelect = document.getElementById('piece-select');
+        if (!pieceSelect) return;
+        
+        // 清空下拉框
+        pieceSelect.innerHTML = '<option value="">-- 选择棋子 --</option>';
+        
+        // 添加棋子类型选项
+        for (const [id, info] of Object.entries(mapData.piece_types)) {
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = info.name;
+            pieceSelect.appendChild(option);
+        }
+        
+        // 添加选择事件监听
+        pieceSelect.onchange = function() {
+            updatePiecePreview(this.value);
+        };
+    }
+    
+    // 更新棋子样式预览
+    function updatePiecePreview(pieceId) {
+        const preview = document.getElementById('piece-preview');
+        const editBtn = document.getElementById('edit-selected-piece');
+        const deleteBtn = document.getElementById('delete-selected-piece');
+        
+        if (!preview) return;
+        
+        if (!pieceId) {
+            preview.innerHTML = '<span style="font-size: 24px;">请选择棋子</span>';
+            if (editBtn) editBtn.disabled = true;
+            if (deleteBtn) deleteBtn.disabled = true;
+            return;
+        }
+        
+        const piece = mapData.piece_types[pieceId];
+        if (!piece) {
+            preview.innerHTML = '<span style="font-size: 24px;">棋子不存在</span>';
+            if (editBtn) editBtn.disabled = true;
+            if (deleteBtn) deleteBtn.disabled = true;
+            return;
+        }
+        
+        // 生成棋子预览
+        preview.innerHTML = `
+            <div style="text-align: center;">
+                <div style="font-size: 48px; margin-bottom: 15px;">${pieceId}</div>
+                <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">${piece.name}</div>
+                <div style="margin-bottom: 8px;">${piece.description}</div>
+                <div style="margin-bottom: 5px;">移动范围: ${piece.move_range}</div>
+                <div style="margin-bottom: 5px;">攻击范围: ${piece.combat_range}</div>
+                <div style="margin-bottom: 5px;">基础攻击力: ${piece.base_power}</div>
+                <div>攻击类型: ${piece.attack_type === 'melee' ? '近战' : '远程'}</div>
+            </div>
+        `;
+        
+        // 启用编辑和删除按钮
+        if (editBtn) editBtn.disabled = false;
+        if (deleteBtn) deleteBtn.disabled = false;
+        // 保存当前选中的棋子ID
+        window.selectedPieceId = pieceId;
+    }
+    
+    // 根据下拉框选择生成棋子
+    function selectPieceFromDropdown() {
+        const color = document.getElementById('piece-color').value;
+        const pieceType = document.getElementById('piece-type').value;
+        
+        if (!pieceType) {
+            showMessage('请选择棋子类型', 'error');
+            return;
+        }
+        
+        selectPiece(pieceType, color);
+        showMessage(`已选择棋子: ${getPieceName(pieceType)} (${color === 'R' ? '红色' : '黑色'})`, 'success');
+    }
+    
+    // 初始化
+    window.onload = async function() {
+        loadCacheFromLocalStorage(); // 从本地存储加载缓存数据
+        await initMap();
+        initHeightSelect();
+        updatePieceTypeDropdown();
+        refreshMapList();
+    };
+</script>
+{% endblock %}
