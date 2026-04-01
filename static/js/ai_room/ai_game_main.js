@@ -665,7 +665,14 @@ function resolveCombat() {
             if (combat.defender.side === 'B') {
                 endAITurn();
             } else {
-                endTurn();
+                isAIThinking = false;
+                if (gameState.steps_left > 0) {
+                    addLog('✅ 防守成功，回合继续');
+                    updateInfo();
+                    updateButtonState();
+                } else {
+                    endTurn();
+                }
             }
         } else {
             if (gameState.steps_left > 0) {
@@ -678,6 +685,7 @@ function resolveCombat() {
                 if (combat.attacker.side === 'B') {
                     endAITurn();
                 } else {
+                    isAIThinking = false;
                     endTurn();
                 }
             }
@@ -825,7 +833,10 @@ function animateDiceRoll(finalSticks, onComplete, roller) {
 }
 
 function autoRollForPlayer() {
+    console.log('[DEBUG] autoRollForPlayer 被调用');
+    console.log('[DEBUG] isAIThinking:', isAIThinking, 'has_rolled:', gameState.has_rolled, 'rolled_by_player:', gameState.rolled_by_player);
     if (isAIThinking || gameState.has_rolled || gameState.rolled_by_player) {
+        console.log('[DEBUG] autoRollForPlayer 被阻止');
         return;
     }
 
@@ -1294,6 +1305,7 @@ function endAITurn() {
     updateButtonState();
 
     showTurnAnnouncement('R', () => {
+        console.log('[DEBUG] endAITurn 回合切换回调执行');
         isGameLocked = false;
         startPlayerTurn();
     });
@@ -1315,7 +1327,11 @@ function waitForAnnouncement(callback) {
 }
 
 function showTurnAnnouncement(side, onComplete) {
-    if (isAnnouncing) return;
+    console.log('[DEBUG] showTurnAnnouncement 被调用, isAnnouncing:', isAnnouncing, 'side:', side);
+    if (isAnnouncing) {
+        console.log('[DEBUG] showTurnAnnouncement 被阻止: isAnnouncing = true');
+        return;
+    }
     isAnnouncing = true;
 
     soundFX.playTurnAnnouncement();
