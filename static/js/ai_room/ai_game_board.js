@@ -1,7 +1,5 @@
 let pieceActionMode = null;
 let moveDetailsMap = new Map();
-let boardWidth = 0;
-let boardHeight = 0;
 
 function showPieceActionModal(piece) {
     const modal = document.getElementById('piece-action-modal');
