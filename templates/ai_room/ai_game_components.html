@@ -4,6 +4,17 @@
     <button id="combat-confirm-btn" onclick="dismissCombatModal()">确 定</button>
 </div>
 
+<div id="piece-action-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(250, 246, 239, 0.98); padding:30px 40px; border:4px solid var(--ink-brown); border-radius:16px; z-index:6000; text-align:center; box-shadow: 0 0 60px rgba(74, 124, 155, 0.5); font-family: 'KaiTi', 'STKaiti', 'FangSong', serif; min-width:320px;">
+    <h2 id="piece-action-title" style="color:var(--ink-brown); margin:0 0 20px 0; font-size:24px; letter-spacing:3px;"></h2>
+    <div id="piece-action-info" style="color:var(--ink-dark); margin:0 0 25px 0; font-size:16px;"></div>
+    <div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap;">
+        <button id="btn-action-move" onclick="selectPieceAction('move')" style="background:linear-gradient(135deg, #4a7c59 0%, #3d6b4a 100%); color:white; border:2px solid var(--ink-brown); padding:12px 30px; font-size:18px; font-family: 'KaiTi', serif; border-radius:8px; cursor:pointer; letter-spacing:3px; min-width:120px;">移动</button>
+        <button id="btn-action-attack" onclick="selectPieceAction('attack')" style="background:linear-gradient(135deg, var(--ink-red) 0%, #6b1d00 100%); color:white; border:2px solid var(--ink-brown); padding:12px 30px; font-size:18px; font-family: 'KaiTi', serif; border-radius:8px; cursor:pointer; letter-spacing:3px; min-width:120px;">攻击</button>
+        <button onclick="cancelPieceAction()" style="background:linear-gradient(135deg, #888 0%, #666 100%); color:white; border:2px solid var(--ink-brown); padding:12px 30px; font-size:18px; font-family: 'KaiTi', serif; border-radius:8px; cursor:pointer; letter-spacing:3px;">取消</button>
+    </div>
+    <p style="color:#888; font-size:14px; margin:15px 0 0 0;">点击空白处或按 ESC 键也可取消选择</p>
+</div>
+
 <div id="restore-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(250, 246, 239, 0.98); padding:50px; border:4px solid var(--ink-brown); border-radius:16px; z-index:8000; text-align:center; box-shadow: 0 0 60px rgba(74, 124, 155, 0.5); font-family: 'KaiTi', 'STKaiti', 'FangSong', serif;">
     <h2 style="color: var(--ink-brown); margin:0 0 20px 0; font-size:28px; letter-spacing:5px;">检测到存档</h2>
     <p style="color: var(--ink-dark); margin:0 0 30px 0; font-size:18px;">是否继续上局游戏？</p>

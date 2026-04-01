@@ -959,6 +959,9 @@ function endTurn() {
 
     gameState.turn_number = (gameState.turn_number || 1) + 1;
 
+    selectedPiece = null;
+    pieceActionMode = null;
+
     addLog('🔄 回合结束');
     soundFX.playTurnEnd();
     renderBoard(gameState.board);

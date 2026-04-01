@@ -1,3 +1,105 @@
+let pieceActionMode = null;
+let moveDetailsMap = new Map();
+let selectedPiece = null;
+let globalBoardState = null;
+let showTerrainNumbers = false;
+let boardWidth = 0;
+let boardHeight = 0;
+
+function showPieceActionModal(piece) {
+    const modal = document.getElementById('piece-action-modal');
+    const title = document.getElementById('piece-action-title');
+    const info = document.getElementById('piece-action-info');
+    const moveBtn = document.getElementById('btn-action-move');
+    const attackBtn = document.getElementById('btn-action-attack');
+    
+    if (!modal || !title || !info) return;
+    
+    const pieceTypes = gameState?.piece_types || {};
+    const pieceType = pieceTypes[piece.type] || {};
+    const pieceName = pieceType.name || piece.type;
+    
+    title.innerText = `选择「${pieceName}」的动作`;
+    
+    const stepsLeft = gameState.steps_left || 0;
+    info.innerHTML = `剩余步数：<strong>${stepsLeft}</strong> 步`;
+    
+    moveBtn.style.display = 'inline-block';
+    attackBtn.style.display = 'inline-block';
+    
+    modal.style.display = 'block';
+}
+
+function hidePieceActionModal() {
+    const modal = document.getElementById('piece-action-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function selectPieceAction(mode) {
+    pieceActionMode = mode;
+    hidePieceActionModal();
+    
+    if (mode === 'move') {
+        addLog('📍 已选择移动模式，点击绿色区域移动');
+    } else if (mode === 'attack') {
+        addLog('⚔️ 已选择攻击模式，点击敌方棋子攻击');
+    }
+    
+    renderBoard(globalBoardState);
+}
+
+function cancelPieceAction() {
+    selectedPiece = null;
+    pieceActionMode = null;
+    hidePieceActionModal();
+    renderBoard(globalBoardState);
+    addLog('已取消选择');
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('piece-action-modal').style.display !== 'none') {
+        cancelPieceAction();
+    }
+});
+
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('piece-action-modal');
+    if (!modal) return;
+    
+    if (modal.style.display !== 'none') {
+        const isClickInside = modal.contains(e.target);
+        const isModalButton = e.target.closest('#piece-action-modal button');
+        
+        if (!isClickInside && selectedPiece) {
+            const data = viewToData(selectedPiece.r, selectedPiece.c);
+            const boardContainer = document.getElementById('game-board');
+            const cells = boardContainer.querySelectorAll('.cell');
+            
+            let clickedOnSelected = false;
+            for (const cell of cells) {
+                const cellViewR = parseInt(cell.dataset.viewR);
+                const cellViewC = parseInt(cell.dataset.viewC);
+                const cellData = viewToData(cellViewR, cellViewC);
+                
+                if (cellData.r === data.r && cellData.c === data.c) {
+                    const rect = cell.getBoundingClientRect();
+                    if (e.clientX >= rect.left && e.clientX <= rect.right &&
+                        e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                        clickedOnSelected = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!clickedOnSelected && !isModalButton) {
+                cancelPieceAction();
+            }
+        }
+    }
+});
+
 function renderBoard(boardData) {
     globalBoardState = boardData;
     const boardContainer = document.getElementById('game-board');
@@ -51,15 +153,25 @@ function renderBoard(boardData) {
             const moveInfo = moveRange.details.get(`${data.c},${data.r}`);
             
             if (moveInfo) {
-                if (moveInfo.isRangedAttack) {
-                    cell.classList.add('ranged-attack');
-                    addMoveIndicator(cell, '弓', 'ranged');
-                } else if (moveInfo.isCapture) {
-                    cell.classList.add('can-capture');
-                    addMoveIndicator(cell, moveInfo.cost, 'capture');
-                } else {
-                    cell.classList.add('valid-move');
-                    addMoveIndicator(cell, moveInfo.cost, 'move');
+                let shouldHighlight = true;
+                
+                if (pieceActionMode === 'move' && (moveInfo.isRangedAttack || moveInfo.isCapture)) {
+                    shouldHighlight = false;
+                } else if (pieceActionMode === 'attack' && !moveInfo.isRangedAttack && !moveInfo.isCapture) {
+                    shouldHighlight = false;
+                }
+                
+                if (shouldHighlight) {
+                    if (moveInfo.isRangedAttack) {
+                        cell.classList.add('ranged-attack');
+                        addMoveIndicator(cell, '弓', 'ranged');
+                    } else if (moveInfo.isCapture) {
+                        cell.classList.add('can-capture');
+                        addMoveIndicator(cell, moveInfo.cost, 'capture');
+                    } else {
+                        cell.classList.add('valid-move');
+                        addMoveIndicator(cell, moveInfo.cost, 'move');
+                    }
                 }
 
                 cell.addEventListener('mouseenter', () => {
@@ -215,19 +327,21 @@ function handleCellClick(viewR, viewC) {
         if (piece && piece.side === mySide) {
             selectedPiece = { r: data.r, c: data.c };
             soundFX.playClick();
-            renderBoard(globalBoardState);
+            showPieceActionModal(piece);
         }
     } else {
         if (selectedPiece.r === data.r && selectedPiece.c === data.c) {
             selectedPiece = null;
+            pieceActionMode = null;
             renderBoard(globalBoardState);
             return;
         }
         
         if (piece && piece.side === mySide) {
             selectedPiece = { r: data.r, c: data.c };
+            pieceActionMode = null;
             soundFX.playClick();
-            renderBoard(globalBoardState);
+            showPieceActionModal(piece);
             return;
         }
         
@@ -237,16 +351,31 @@ function handleCellClick(viewR, viewC) {
         const isValidMove = moves.moves.some(m => m.row === data.r && m.col === data.c);
         const isValidCapture = moves.captures.some(c => c.row === data.r && c.col === data.c);
         
-        if (isValidMove || isValidCapture) {
+        if (isValidMove && (!pieceActionMode || pieceActionMode === 'move')) {
             if (clickTimer) {
                 clearTimeout(clickTimer);
                 clickTimer = null;
             }
             handlePlayerMove(selectedPiece.r, selectedPiece.c, data.r, data.c);
-        } else {
-            handlePlayerMove(selectedPiece.r, selectedPiece.c, data.r, data.c);
+            selectedPiece = null;
+            pieceActionMode = null;
+            return;
         }
+        
+        if (isValidCapture && (!pieceActionMode || pieceActionMode === 'attack')) {
+            if (clickTimer) {
+                clearTimeout(clickTimer);
+                clickTimer = null;
+            }
+            handlePlayerMove(selectedPiece.r, selectedPiece.c, data.r, data.c);
+            selectedPiece = null;
+            pieceActionMode = null;
+            return;
+        }
+        
         selectedPiece = null;
+        pieceActionMode = null;
+        renderBoard(globalBoardState);
     }
 }
 
