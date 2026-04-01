@@ -167,8 +167,10 @@ def handle_move(data):
             if dist == 1:
                 valid_move = True
         elif attack_type == 'ranged':
-            # 计算基础攻击距离
+            # 从数据库读取攻击范围
             base_range = 3
+            if 'piece_types' in state and attacker_type in state['piece_types']:
+                base_range = state['piece_types'][attacker_type].get('combat_range', 3)
             # 计算最大攻击距离
             max_range = base_range + height_diff
             max_range = max(1, max_range)  # 确保至少可以攻击1格
@@ -216,14 +218,19 @@ def handle_move(data):
                 
                 # 检查攻击距离和路径
                 dist = move_dist
+                # 从数据库读取攻击范围
+                base_range = 3
+                if 'piece_types' in state and attacker['type'] in state['piece_types']:
+                    base_range = state['piece_types'][attacker['type']].get('combat_range', 3)
                 # 计算最大攻击距离
-                max_range = 3
                 if 'terrain' in state and 'height' in state['terrain']:
                     current_height = state['terrain']['height'][fr][fc]
                     target_height = state['terrain']['height'][tr][tc]
                     height_diff = current_height - target_height
-                    max_range = 3 + height_diff
+                    max_range = base_range + height_diff
                     max_range = max(1, max_range)
+                else:
+                    max_range = base_range
                 
                 # 检查攻击距离是否在范围内
                 if 1 <= dist <= max_range:
@@ -765,8 +772,13 @@ def resolve_combat(room, state):
 
     # --- 2. 判定胜负 (保持原有逻辑) ---
     
-    # 检查是否是炮攻击地形
-    is_cannon_attack_terrain = attacker_piece['type'] == 'P' and def_info.get('is_terrain')
+    # 检查攻击方是否具有改变地形的能力
+    can_change_terrain = False
+    if 'piece_types' in state and attacker_piece['type'] in state['piece_types']:
+        can_change_terrain = state['piece_types'][attacker_piece['type']].get('terrain_change', False)
+    
+    # 检查是否是可改变地形的棋子攻击地形
+    is_cannon_attack_terrain = can_change_terrain and def_info.get('is_terrain')
     
     if is_cannon_attack_terrain:
         # 炮攻击地形时的处理逻辑
@@ -861,8 +873,8 @@ def resolve_combat(room, state):
                 # 失败方是防守方（target_piece被击败）
                 generate_and_give_recruit_card(room, state, def_info['side'], combat_log)
                 
-                # 炮攻击时降低地形高度
-                if attacker_piece['type'] == 'P' and 'terrain' in state and 'height' in state['terrain']:
+                # 可改变地形的棋子攻击时降低地形高度
+                if can_change_terrain and 'terrain' in state and 'height' in state['terrain']:
                     if 0 <= tr < len(state['terrain']['height']) and 0 <= tc < len(state['terrain']['height'][tr]):
                         current_height = state['terrain']['height'][tr][tc]
                         new_height = max(-1, current_height - 1)
