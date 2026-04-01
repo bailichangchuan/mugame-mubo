@@ -9,7 +9,10 @@ def create_app():
 
     # 初始化扩展
     db.init_app(app)
+    # 本地测试用
     socketio.init_app(app)
+    # 部署到服务器用
+    #socketio.init_app(app, path='/game/bo/socket.io', cors_allowed_origins="*")
     login_manager.init_app(app)
 
     # 注册蓝图
