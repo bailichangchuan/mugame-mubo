@@ -34,15 +34,13 @@ function showPieceActionModal(piece) {
     attackBtn.style.display = 'inline-block';
     
     modal.classList.remove('piece-action-modal-hidden');
-    modal.style.display = 'block';
-    console.log('[DEBUG] 模态框已显示, classList:', modal.className);
+    console.log('[DEBUG] 模态框已显示, classList:', modal.className, 'style.display:', modal.style.display);
 }
 
 function hidePieceActionModal() {
     const modal = document.getElementById('piece-action-modal');
     if (modal) {
         modal.classList.add('piece-action-modal-hidden');
-        modal.style.display = 'none';
     }
 }
 
