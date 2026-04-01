@@ -2070,16 +2070,18 @@
         }
 
         .piece.selected:active {
-            transform: scale(1.1);
+            transform: scale(1.15) !important;
             box-shadow:
-                0 0 15px 8px rgba(180, 60, 30, 0.8),
-                0 0 30px 15px rgba(180, 60, 30, 0.4);
+                0 0 20px 10px rgba(180, 60, 30, 0.9),
+                0 0 40px 20px rgba(180, 60, 30, 0.5) !important;
+            animation: selectedGlowRed 0.8s ease-in-out infinite !important;
         }
 
         .piece.selected.side-B:active {
             box-shadow:
-                0 0 15px 8px rgba(80, 70, 60, 0.8),
-                0 0 30px 15px rgba(80, 70, 60, 0.4);
+                0 0 20px 10px rgba(80, 70, 60, 0.9),
+                0 0 40px 20px rgba(80, 70, 60, 0.5) !important;
+            animation: selectedGlowBlack 0.8s ease-in-out infinite !important;
         }
     }
 
@@ -2092,16 +2094,18 @@
         }
 
         .piece.selected:active {
-            transform: scale(1.1);
+            transform: scale(1.15) !important;
             box-shadow:
-                0 0 15px 8px rgba(180, 60, 30, 0.8),
-                0 0 30px 15px rgba(180, 60, 30, 0.4);
+                0 0 20px 10px rgba(180, 60, 30, 0.9),
+                0 0 40px 20px rgba(180, 60, 30, 0.5) !important;
+            animation: selectedGlowRed 0.8s ease-in-out infinite !important;
         }
 
         .piece.selected.side-B:active {
             box-shadow:
-                0 0 15px 8px rgba(80, 70, 60, 0.8),
-                0 0 30px 15px rgba(80, 70, 60, 0.4);
+                0 0 20px 10px rgba(80, 70, 60, 0.9),
+                0 0 40px 20px rgba(80, 70, 60, 0.5) !important;
+            animation: selectedGlowBlack 0.8s ease-in-out infinite !important;
         }
     }
 
