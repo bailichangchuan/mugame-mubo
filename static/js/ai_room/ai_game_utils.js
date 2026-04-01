@@ -229,8 +229,6 @@ function getMoveInfo(row, col) {
     return null;
 }
 
-let moveDetailsMap = new Map();
-
 function getFarthestInDirection(fromCol, fromRow, toCol, toRow) {
     const dCol = Math.sign(toCol - fromCol);
     const dRow = Math.sign(toRow - fromRow);

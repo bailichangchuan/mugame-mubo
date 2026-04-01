@@ -1,8 +1,5 @@
 let pieceActionMode = null;
 let moveDetailsMap = new Map();
-let selectedPiece = null;
-let globalBoardState = null;
-let showTerrainNumbers = false;
 let boardWidth = 0;
 let boardHeight = 0;
 
