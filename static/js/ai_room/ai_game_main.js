@@ -312,7 +312,7 @@ function playerCombatRoll() {
                 resolveCombat();
             }
         }, 300);
-    });
+    }, 'player', '战斗攻击');
 }
 
 function aiCombatRoll() {
@@ -346,7 +346,7 @@ function aiCombatRoll() {
 
             resolveCombat();
         }, 300);
-    });
+    }, 'AI', '战斗防御');
 }
 
 function aiAttackerCombatRoll() {
@@ -384,7 +384,7 @@ function aiAttackerCombatRoll() {
                 resolveCombat();
             }
         }, 300);
-    });
+    }, 'AI', '战斗攻击');
 }
 
 function playerDefenderCombatRoll() {
@@ -419,7 +419,7 @@ function playerDefenderCombatRoll() {
 
             resolveCombat();
         }, 300);
-    });
+    }, 'player', '战斗防御');
 }
 
 function resolveCombat() {
@@ -770,37 +770,30 @@ function autoDeployRecruitedPiece(state, side, pieceType, cardName) {
 
 // ========== 回合系统 ==========
 
-function createDiceElement(index, finalValue) {
-    const dice = document.createElement('div');
+function createDiceElement(index, finalValue, roller) {
+    const dice = document.createElement('img');
     dice.className = 'binary-dice';
-
-    const bgColor = finalValue === 1
-        ? 'linear-gradient(145deg, var(--ink-red) 0%, #6b1d00 100%)'
-        : 'linear-gradient(145deg, #2a2520 0%, var(--ink-black) 100%)';
-
+    
+    let imgSrc;
+    if (roller === 'player') {
+        imgSrc = finalValue === 1 ? RED_PICTURE : BLACK_PICTURE;
+    } else {
+        imgSrc = finalValue === 1 ? BLACK_PICTURE : RED_PICTURE;
+    }
+    dice.src = imgSrc;
+    
     dice.style.cssText = `
-        width: 55px;
-        height: 55px;
-        background: ${bgColor};
-        border: 3px solid var(--ink-brown);
-        border-radius: 10px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 28px;
-        font-weight: bold;
-        color: white;
-        font-family: 'KaiTi', serif;
-        opacity: 0;
-        transform: scale(0.5);
-        transition: all 0.3s ease;
-    `;
-    dice.textContent = finalValue;
+         width: 5%;
+         opacity: 0;
+         transform: scale(0.5);
+         transition: all 0.3s ease;
+     `;
     dice.dataset.index = index;
+    dice.alt = finalValue === 1 ? '一' : '零';
     return dice;
 }
 
-function animateDiceRoll(finalSticks, onComplete, roller) {
+function animateDiceRoll(finalSticks, onComplete, roller, reason) {
     const diceAnimation = document.getElementById('dice-animation');
     const rollTitle = document.getElementById('roll-title');
     if (!diceAnimation) {
@@ -810,14 +803,15 @@ function animateDiceRoll(finalSticks, onComplete, roller) {
 
     if (rollTitle) {
         const rollerText = roller === 'AI' ? '🤖 AI' : (roller === 'player' ? '🔴 红方' : '🎲');
-        rollTitle.innerHTML = `${rollerText} 掷采中...`;
+        const reasonText = reason ? `（${reason}）` : '';
+        rollTitle.innerHTML = `${rollerText} 掷采中 ${reasonText}`;
     }
 
     diceAnimation.innerHTML = '';
 
     for (let i = 0; i < 6; i++) {
         setTimeout(() => {
-            const dice = createDiceElement(i, finalSticks[i]);
+            const dice = createDiceElement(i, finalSticks[i], roller);
             diceAnimation.appendChild(dice);
 
             setTimeout(() => {
@@ -825,10 +819,12 @@ function animateDiceRoll(finalSticks, onComplete, roller) {
                 dice.style.transform = 'scale(1)';
 
                 if (i === 5 && onComplete) {
-                    onComplete();
+                    setTimeout(() => {
+                        onComplete();
+                    }, 1500);
                 }
             }, 50);
-        }, i * 150);
+        }, i * 300);
     }
 }
 
@@ -877,7 +873,7 @@ function autoRollForPlayer() {
                 saveGameStateToCookie();
             }
         }, 500);
-    }, 'player');
+    }, 'player', '获取步数');
 }
 
 function showZeroRollModal() {
@@ -958,9 +954,6 @@ function endTurn() {
     }
 
     gameState.turn_number = (gameState.turn_number || 1) + 1;
-
-    selectedPiece = null;
-    pieceActionMode = null;
 
     addLog('🔄 回合结束');
     soundFX.playTurnEnd();
@@ -1092,7 +1085,7 @@ function executeAITurn() {
                         setTimeout(() => executeAIMove(), 500);
                     }
                 }, 500);
-            });
+            }, 'AI', '获取步数');
         }, 500);
     }, 'AI');
 }

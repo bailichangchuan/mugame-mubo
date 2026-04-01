@@ -30,13 +30,19 @@
     const p2Name = "{{ p2_name }}";
     const mapName = "{{ map_name or 'default_map' }}";
     
+    const RED_PICTURE = "/static/js/red_dice.png";
+    const BLACK_PICTURE = "/static/js/black_dice.png";
+    
     let mySide = myUserId === p1Id ? 'R' : 'B';
     let globalBoardState = [];
     let selectedPiece = null;
+    let selectedActionMode = null;
+    let isShowingActionModal = false;
     let isAIThinking = false;
     let showTerrainNumbers = true;
     let isGameLocked = false;
     let isFirstTurn = true;
+    let terrainChangeTarget = null;
 
     let gameState = null;
     
@@ -124,5 +130,265 @@
         d.innerText = msg;
         logArea.prepend(d);
     }
+
+    function showPieceActionModal(pieceName) {
+        const modal = document.getElementById('piece-action-modal');
+        const desc = document.getElementById('piece-action-desc');
+        const costInfo = document.getElementById('move-cost-info');
+        const moveBtn = document.getElementById('btn-select-move');
+        const attackBtn = document.getElementById('btn-select-attack');
+        const terrainBtn = document.getElementById('btn-select-terrain');
+        
+        desc.innerHTML = `请选择 <strong style="color: var(--ink-red);">${pieceName}</strong> 的动作`;
+        
+        const piece = gameState.board[selectedPiece.r][selectedPiece.c];
+        const pos = [selectedPiece.c, selectedPiece.r];
+        const stepsLeft = gameState.steps_left || 0;
+        const moveRange = getMoveRange(piece, pos, stepsLeft, gameState);
+        
+        const moves = moveRange.moves;
+        const captures = moveRange.captures;
+        
+        const pieceTypeData = gameState.piece_types && gameState.piece_types[piece.type];
+        const pieceBaseMoveCost = pieceTypeData?.move_cost || 1;
+        const canChangeTerrain = pieceTypeData?.terrain_change === true || pieceTypeData?.terrain_change === 1;
+        
+        let costHTML = `<div style="margin-bottom:10px;"><strong>剩余步数：</strong><span style="color:var(--ink-red); font-size:16px;">${stepsLeft}</span></div>`;
+        
+        costHTML += `<div style="background:rgba(74, 124, 155, 0.1); padding:10px; border-radius:6px; margin-bottom:15px;">`;
+        costHTML += `<div style="margin-bottom:5px;"><strong>📊 棋子属性：</strong></div>`;
+        costHTML += `<div style="font-size:13px; color:var(--ink-dark);">`;
+        costHTML += `基础移动成本：<strong>${pieceBaseMoveCost}</strong> 步/格`;
+        if (pieceTypeData?.move_range) {
+            costHTML += ` | 移动范围：<strong>${pieceTypeData.move_range}</strong> 格`;
+        }
+        if (pieceTypeData?.combat_range) {
+            costHTML += ` | 攻击范围：<strong>${pieceTypeData.combat_range}</strong> 格`;
+        }
+        if (canChangeTerrain) {
+            costHTML += ` | <span style="color:#8B4513;"><strong>🏗️ 可修改地形</strong></span>`;
+        }
+        costHTML += `</div>`;
+        
+        if (gameState.terrain_types) {
+            const terrainTypes = Object.entries(gameState.terrain_types);
+            if (terrainTypes.length > 0) {
+                costHTML += `<div style="font-size:12px; color:var(--ink-dark); margin-top:8px; padding-top:8px; border-top:1px solid rgba(0,0,0,0.1);">`;
+                costHTML += `<div style="margin-bottom:5px;"><strong>🗺️ 地形成本：</strong></div>`;
+                terrainTypes.forEach(([key, terrain]) => {
+                    if (terrain.move_cost !== 1) {
+                        costHTML += `<div>${terrain.name}: <strong>${terrain.move_cost}</strong> 步/格</div>`;
+                    }
+                });
+                costHTML += `</div>`;
+            }
+        }
+        
+        costHTML += `</div>`;
+        
+        if (moves.length > 0) {
+            const moveCosts = moves.map(m => m.cost);
+            const minMoveCost = Math.min(...moveCosts);
+            const maxMoveCost = Math.max(...moveCosts);
+            const avgMoveCost = (moveCosts.reduce((a, b) => a + b, 0) / moveCosts.length).toFixed(1);
+            
+            costHTML += `<div style="margin-bottom:8px;"><span style="color:#4a7c59;">🟢 移动选项：</span>${moves.length}个位置</div>`;
+            costHTML += `<div style="font-size:13px; color:var(--ink-dark);">`;
+            costHTML += `消耗步数：<strong>${minMoveCost === maxMoveCost ? minMoveCost : minMoveCost + '~' + maxMoveCost}</strong>`;
+            costHTML += `（平均 <strong>${avgMoveCost}</strong> 步）`;
+            costHTML += `</div>`;
+        }
+        
+        if (captures.length > 0) {
+            const captureCosts = captures.map(c => c.cost);
+            const minCaptureCost = Math.min(...captureCosts);
+            const maxCaptureCost = Math.max(...captureCosts);
+            const avgCaptureCost = (captureCosts.reduce((a, b) => a + b, 0) / captureCosts.length).toFixed(1);
+            
+            costHTML += `<div style="margin-top:${moves.length > 0 ? '10px' : '0'}; margin-bottom:8px;"><span style="color:var(--ink-red);">⚔️ 攻击选项：</span>${captures.length}个目标</div>`;
+            costHTML += `<div style="font-size:13px; color:var(--ink-dark);">`;
+            costHTML += `消耗步数：<strong>${minCaptureCost === maxCaptureCost ? minCaptureCost : minCaptureCost + '~' + maxCaptureCost}</strong>`;
+            costHTML += `（平均 <strong>${avgCaptureCost}</strong> 步）`;
+            costHTML += `</div>`;
+        }
+        
+        if (moveRange.rangedAttacks && moveRange.rangedAttacks.length > 0) {
+            costHTML += `<div style="margin-top:10px; margin-bottom:8px;"><span style="color:purple;">🏹 远程攻击：</span>${moveRange.rangedAttacks.length}个目标</div>`;
+            costHTML += `<div style="font-size:13px; color:var(--ink-dark);">`;
+            costHTML += `<strong>无需移动</strong>，可直接攻击`;
+            costHTML += `</div>`;
+        }
+        
+        if (moves.length === 0 && captures.length === 0 && (moveRange.rangedAttacks?.length || 0) === 0) {
+            costHTML = `<div style="color:var(--ink-red);"><strong>⚠️ 该棋子当前没有可用的动作</strong></div>`;
+        }
+        
+        costInfo.innerHTML = costHTML;
+        
+        moveBtn.disabled = moves.length === 0;
+        attackBtn.disabled = captures.length === 0 && (moveRange.rangedAttacks?.length || 0) === 0;
+        terrainBtn.disabled = !canChangeTerrain;
+        
+        modal.style.display = 'block';
+        isShowingActionModal = true;
+    }
+
+    function selectAction(action) {
+        const modal = document.getElementById('piece-action-modal');
+        modal.style.display = 'none';
+        isShowingActionModal = false;
+        
+        selectedActionMode = action;
+        
+        if (action === 'terrain') {
+            addLog('🏗️ 已选择修改地形模式，点击棋盘上的空格来修改地形高度');
+            renderBoard(gameState.board);
+            return;
+        }
+        
+        const piece = gameState.board[selectedPiece.r][selectedPiece.c];
+        const pos = [selectedPiece.c, selectedPiece.r];
+        const stepsLeft = gameState.steps_left || 0;
+        const moveRange = getMoveRange(piece, pos, stepsLeft, gameState);
+        
+        if (action === 'move') {
+            moveRange.captures = [];
+            moveRange.details.forEach((info, key) => {
+                if (info.isCapture || info.isRangedAttack) {
+                    moveRange.details.delete(key);
+                }
+            });
+        } else if (action === 'attack') {
+            moveRange.moves = [];
+            moveRange.details.forEach((info, key) => {
+                if (!info.isCapture && !info.isRangedAttack) {
+                    moveRange.details.delete(key);
+                }
+            });
+        }
+        
+        moveDetailsMap = moveRange.details;
+        renderBoard(gameState.board);
+        addLog(`📍 已选择${action === 'move' ? '移动' : '攻击'}模式`);
+    }
+
+    function cancelAction() {
+        const modal = document.getElementById('piece-action-modal');
+        modal.style.display = 'none';
+        isShowingActionModal = false;
+        
+        selectedPiece = null;
+        selectedActionMode = null;
+        terrainChangeTarget = null;
+        moveDetailsMap = new Map();
+        renderBoard(gameState.board);
+        addLog('❌ 已取消选择');
+    }
+
+    function closeTerrainChangeModal() {
+        const modal = document.getElementById('terrain-change-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+        terrainChangeTarget = null;
+        addLog('❌ 已取消地形修改');
+    }
+
+    function applyTerrainChange(heightChange) {
+        if (!terrainChangeTarget || !selectedPiece) {
+            closeTerrainChangeModal();
+            return;
+        }
+        
+        const { r, c } = terrainChangeTarget;
+        const currentHeight = gameState.terrain.height[r][c];
+        const newHeight = currentHeight + heightChange;
+        
+        if (currentHeight <= -4 && heightChange < 0) {
+            addLog(`⚠️ 地形高度已为-4，无法再降低`);
+            closeTerrainChangeModal();
+            return;
+        }
+        
+        if (newHeight > 4) {
+            addLog(`⚠️ 高度不能超过4，当前高度：${currentHeight}`);
+            closeTerrainChangeModal();
+            return;
+        }
+        
+        gameState.terrain.height[r][c] = newHeight;
+        gameState.steps_left -= 1;
+        
+        soundFX.playPieceMove();
+        
+        closeTerrainChangeModal();
+        terrainChangeTarget = null;
+        selectedPiece = null;
+        selectedActionMode = null;
+        
+        renderBoard(gameState.board);
+        updateInfo();
+        
+        addLog(`🏗️ 地形高度已修改：(${r}, ${c}) 从 ${currentHeight} 变为 ${newHeight}`);
+        
+        if (gameState.steps_left <= 0) {
+            addLog('⚠️ 步数已用完，回合结束');
+            setTimeout(() => {
+                if (typeof endTurn === 'function') {
+                    endTurn();
+                } else if (typeof aiEndTurn === 'function') {
+                    aiEndTurn();
+                }
+            }, 500);
+        }
+    }
+
+    function getTerrainChangeTargets(piece, pos, gameState) {
+        const [col, row] = pos;
+        const targets = [];
+        const board = gameState.board;
+        const numRows = board.length;
+        const numCols = board[0].length;
+        const terrainHeight = gameState.terrain?.height;
+        
+        const pieceTypeData = gameState.piece_types?.[piece.type];
+        const terrainChangeRange = pieceTypeData?.terrain_change_range || 1;
+        
+        for (let targetRow = 0; targetRow < numRows; targetRow++) {
+            for (let targetCol = 0; targetCol < numCols; targetCol++) {
+                if (targetRow === row && targetCol === col) continue;
+                
+                const dist = Math.abs(targetRow - row) + Math.abs(targetCol - col);
+                if (dist > terrainChangeRange) continue;
+                
+                if (terrainHeight) {
+                    const currentHeight = terrainHeight[targetRow][targetCol];
+                    targets.push({
+                        row: targetRow,
+                        col: targetCol,
+                        currentHeight: currentHeight,
+                        dist: dist
+                    });
+                }
+            }
+        }
+        
+        return targets;
+    }
+
+    document.addEventListener('click', function(e) {
+        const boardContainer = document.getElementById('game-board');
+        const modal = document.getElementById('piece-action-modal');
+        
+        if (selectedPiece && !isShowingActionModal && boardContainer && modal) {
+            const isClickOnBoard = boardContainer.contains(e.target);
+            const isClickOnModal = modal.contains(e.target);
+            const isClickOnSidebar = e.target.closest('.rules-sidebar') || e.target.closest('.info-sidebar');
+            
+            if (!isClickOnBoard && !isClickOnModal && !isClickOnSidebar) {
+                cancelAction();
+            }
+        }
+    });
 </script>
 {% endblock %}

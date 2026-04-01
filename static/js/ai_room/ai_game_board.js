@@ -1,110 +1,3 @@
-let pieceActionMode = null;
-let moveDetailsMap = new Map();
-
-function showPieceActionModal(piece) {
-    console.log('[DEBUG] showPieceActionModal 被调用', piece);
-    
-    const modal = document.getElementById('piece-action-modal');
-    const title = document.getElementById('piece-action-title');
-    const info = document.getElementById('piece-action-info');
-    
-    console.log('[DEBUG] modal元素:', modal, 'title:', title, 'info:', info);
-    
-    if (!modal) {
-        console.error('[ERROR] 找不到 piece-action-modal 元素');
-        return;
-    }
-    if (!title || !info) {
-        console.error('[ERROR] 找不到模态框的子元素');
-        return;
-    }
-    
-    const pieceTypes = (gameState && gameState.piece_types) || {};
-    const pieceType = pieceTypes[piece.type] || {};
-    const pieceName = pieceType.name || piece.type || '未知棋子';
-    
-    title.innerText = `选择「${pieceName}」的动作`;
-    
-    const stepsLeft = (gameState && gameState.steps_left) || 0;
-    info.innerHTML = `剩余步数：<strong>${stepsLeft}</strong> 步`;
-    
-    modal.style.display = 'block';
-    console.log('[DEBUG] 模态框已显示, style.display:', modal.style.display);
-}
-
-function hidePieceActionModal() {
-    const modal = document.getElementById('piece-action-modal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-function selectPieceAction(mode) {
-    pieceActionMode = mode;
-    hidePieceActionModal();
-    
-    if (mode === 'move') {
-        addLog('📍 已选择移动模式，点击绿色区域移动');
-    } else if (mode === 'attack') {
-        addLog('⚔️ 已选择攻击模式，点击敌方棋子攻击');
-    }
-    
-    renderBoard(globalBoardState);
-}
-
-function cancelPieceAction() {
-    selectedPiece = null;
-    pieceActionMode = null;
-    hidePieceActionModal();
-    renderBoard(globalBoardState);
-    addLog('已取消选择');
-}
-
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        const modal = document.getElementById('piece-action-modal');
-        if (modal && modal.style.display === 'block') {
-            cancelPieceAction();
-        }
-    }
-});
-
-document.addEventListener('click', function(e) {
-    const modal = document.getElementById('piece-action-modal');
-    if (!modal) return;
-    
-    if (modal.style.display === 'block') {
-        const isClickInside = modal.contains(e.target);
-        const isModalButton = e.target.closest('#piece-action-modal button');
-        
-        if (!isClickInside && selectedPiece) {
-            const data = viewToData(selectedPiece.r, selectedPiece.c);
-            const boardContainer = document.getElementById('game-board');
-            const cells = boardContainer.querySelectorAll('.cell');
-            
-            let clickedOnSelected = false;
-            for (const cell of cells) {
-                const cellViewR = parseInt(cell.dataset.viewR);
-                const cellViewC = parseInt(cell.dataset.viewC);
-                const cellData = viewToData(cellViewR, cellViewC);
-                
-                if (cellData.r === data.r && cellData.c === data.c) {
-                    const rect = cell.getBoundingClientRect();
-                    if (e.clientX >= rect.left && e.clientX <= rect.right &&
-                        e.clientY >= rect.top && e.clientY <= rect.bottom) {
-                        clickedOnSelected = true;
-                        break;
-                    }
-                }
-            }
-            
-            if (!clickedOnSelected && !isModalButton) {
-                cancelPieceAction();
-            }
-        }
-    }
-});
-
 function renderBoard(boardData) {
     globalBoardState = boardData;
     const boardContainer = document.getElementById('game-board');
@@ -158,15 +51,15 @@ function renderBoard(boardData) {
             const moveInfo = moveRange.details.get(`${data.c},${data.r}`);
             
             if (moveInfo) {
-                let shouldHighlight = true;
+                let shouldShow = true;
                 
-                if (pieceActionMode === 'move' && (moveInfo.isRangedAttack || moveInfo.isCapture)) {
-                    shouldHighlight = false;
-                } else if (pieceActionMode === 'attack' && !moveInfo.isRangedAttack && !moveInfo.isCapture) {
-                    shouldHighlight = false;
+                if (selectedActionMode === 'move' && (moveInfo.isCapture || moveInfo.isRangedAttack)) {
+                    shouldShow = false;
+                } else if (selectedActionMode === 'attack' && !moveInfo.isCapture && !moveInfo.isRangedAttack) {
+                    shouldShow = false;
                 }
                 
-                if (shouldHighlight) {
+                if (shouldShow) {
                     if (moveInfo.isRangedAttack) {
                         cell.classList.add('ranged-attack');
                         addMoveIndicator(cell, '弓', 'ranged');
@@ -177,16 +70,16 @@ function renderBoard(boardData) {
                         cell.classList.add('valid-move');
                         addMoveIndicator(cell, moveInfo.cost, 'move');
                     }
-                }
 
-                cell.addEventListener('mouseenter', () => {
-                    if (!moveInfo.isRangedAttack) {
-                        showMovePath(cell, moveInfo);
-                    }
-                });
-                cell.addEventListener('mouseleave', () => {
-                    hideMovePath();
-                });
+                    cell.addEventListener('mouseenter', () => {
+                        if (!moveInfo.isRangedAttack) {
+                            showMovePath(cell, moveInfo);
+                        }
+                    });
+                    cell.addEventListener('mouseleave', () => {
+                        hideMovePath();
+                    });
+                }
             }
             
             if (terrainData) {
@@ -263,6 +156,29 @@ function renderBoard(boardData) {
                 cell.appendChild(pDiv);
             }
             
+            if (selectedActionMode === 'terrain' && selectedPiece && gameState) {
+                const piece = boardData[selectedPiece.r][selectedPiece.c];
+                if (piece) {
+                    const terrainTargets = getTerrainChangeTargets(piece, [selectedPiece.c, selectedPiece.r], gameState);
+                    const isTarget = terrainTargets.some(t => t.row === data.r && t.col === data.c);
+                    
+                    if (isTarget) {
+                        const target = terrainTargets.find(t => t.row === data.r && t.col === data.c);
+                        cell.classList.add('terrain-change-target');
+                        
+                        const indicator = document.createElement('div');
+                        indicator.className = 'terrain-change-indicator';
+                        indicator.innerHTML = `<span style="color: #8B4513; font-size: 14px;">🏗️</span><span style="font-size: 12px; color: #654321;">${target.currentHeight}</span>`;
+                        indicator.style.position = 'absolute';
+                        indicator.style.top = '2px';
+                        indicator.style.right = '2px';
+                        indicator.style.pointerEvents = 'none';
+                        indicator.style.zIndex = '3';
+                        cell.appendChild(indicator);
+                    }
+                }
+            }
+            
             cell.dataset.viewR = viewR;
             cell.dataset.viewC = viewC;
             cell.onclick = () => handleCellClick(viewR, viewC);
@@ -332,21 +248,103 @@ function handleCellClick(viewR, viewC) {
         if (piece && piece.side === mySide) {
             selectedPiece = { r: data.r, c: data.c };
             soundFX.playClick();
-            showPieceActionModal(piece);
+            
+            const pieceName = gameState.piece_types && gameState.piece_types[piece.type] ? gameState.piece_types[piece.type].name : '棋子';
+            showPieceActionModal(pieceName);
+            moveDetailsMap = new Map();
+            renderBoard(globalBoardState);
         }
     } else {
         if (selectedPiece.r === data.r && selectedPiece.c === data.c) {
-            selectedPiece = null;
-            pieceActionMode = null;
-            renderBoard(globalBoardState);
+            if (selectedActionMode) {
+                selectedActionMode = null;
+                const pieceName = gameState.piece_types && gameState.piece_types[piece.type] ? gameState.piece_types[piece.type].name : '棋子';
+                showPieceActionModal(pieceName);
+                moveDetailsMap = new Map();
+                renderBoard(globalBoardState);
+            } else {
+                selectedPiece = null;
+                moveDetailsMap = new Map();
+                renderBoard(globalBoardState);
+            }
             return;
         }
         
         if (piece && piece.side === mySide) {
             selectedPiece = { r: data.r, c: data.c };
-            pieceActionMode = null;
+            selectedActionMode = null;
             soundFX.playClick();
-            showPieceActionModal(piece);
+            
+            const pieceName = gameState.piece_types && gameState.piece_types[piece.type] ? gameState.piece_types[piece.type].name : '棋子';
+            showPieceActionModal(pieceName);
+            moveDetailsMap = new Map();
+            renderBoard(globalBoardState);
+            return;
+        }
+        
+        if (!selectedActionMode) {
+            addLog('⚠️ 请先选择移动或攻击模式');
+            return;
+        }
+        
+        if (selectedActionMode === 'terrain') {
+            const attacker = gameState.board[selectedPiece.r][selectedPiece.c];
+            const terrainTargets = getTerrainChangeTargets(attacker, [selectedPiece.c, selectedPiece.r], gameState);
+            const isValidTarget = terrainTargets.some(t => t.row === data.r && t.col === data.c);
+            
+            if (!isValidTarget) {
+                addLog('⚠️ 该位置不在可修改范围内');
+                return;
+            }
+            
+            terrainChangeTarget = { r: data.r, c: data.c };
+            const currentHeight = gameState.terrain.height[data.r][data.c];
+            
+            const pieceTypeData = gameState.piece_types?.[attacker.type];
+            const isCannon = attacker.type === 'P';
+            
+            const modal = document.getElementById('terrain-change-modal');
+            const desc = document.getElementById('terrain-change-desc');
+            const btnRaise = document.getElementById('btn-terrain-raise');
+            const btnLower = document.getElementById('btn-terrain-lower');
+            
+            let descText = `选择要修改的位置：(${data.r}, ${data.c})<br>当前高度：${currentHeight}<br>高度范围：-4 ~ 4`;
+            if (isCannon) {
+                descText += `<br><span style="color:#8B4513; font-size:14px;">（炮只能降低地形）</span>`;
+            }
+            desc.innerHTML = descText;
+            
+            if (isCannon) {
+                btnRaise.disabled = true;
+                btnRaise.style.opacity = '0.5';
+                btnRaise.style.cursor = 'not-allowed';
+                btnRaise.title = '炮只能降低地形';
+            } else if (currentHeight >= 4) {
+                btnRaise.disabled = true;
+                btnRaise.style.opacity = '0.5';
+                btnRaise.style.cursor = 'not-allowed';
+                btnRaise.title = '地形高度已为4，无法再升高';
+            } else {
+                btnRaise.disabled = false;
+                btnRaise.style.opacity = '1';
+                btnRaise.style.cursor = 'pointer';
+                btnRaise.title = '';
+            }
+            
+            if (currentHeight <= -4) {
+                btnLower.disabled = true;
+                btnLower.style.opacity = '0.5';
+                btnLower.style.cursor = 'not-allowed';
+                btnLower.title = '地形高度已为-4，无法再降低';
+            } else {
+                btnLower.disabled = false;
+                btnLower.style.opacity = '1';
+                btnLower.style.cursor = 'pointer';
+                btnLower.title = '';
+            }
+            
+            modal.style.display = 'block';
+            
             return;
         }
         
@@ -356,31 +354,28 @@ function handleCellClick(viewR, viewC) {
         const isValidMove = moves.moves.some(m => m.row === data.r && m.col === data.c);
         const isValidCapture = moves.captures.some(c => c.row === data.r && c.col === data.c);
         
-        if (isValidMove && (!pieceActionMode || pieceActionMode === 'move')) {
+        if (selectedActionMode === 'move' && !isValidMove) {
+            addLog('⚠️ 该位置不可移动');
+            return;
+        }
+        
+        if (selectedActionMode === 'attack' && !isValidCapture) {
+            addLog('⚠️ 该位置不可攻击');
+            return;
+        }
+        
+        if (isValidMove || isValidCapture) {
             if (clickTimer) {
                 clearTimeout(clickTimer);
                 clickTimer = null;
             }
             handlePlayerMove(selectedPiece.r, selectedPiece.c, data.r, data.c);
-            selectedPiece = null;
-            pieceActionMode = null;
-            return;
-        }
-        
-        if (isValidCapture && (!pieceActionMode || pieceActionMode === 'attack')) {
-            if (clickTimer) {
-                clearTimeout(clickTimer);
-                clickTimer = null;
-            }
+        } else {
             handlePlayerMove(selectedPiece.r, selectedPiece.c, data.r, data.c);
-            selectedPiece = null;
-            pieceActionMode = null;
-            return;
         }
-        
         selectedPiece = null;
-        pieceActionMode = null;
-        renderBoard(globalBoardState);
+        selectedActionMode = null;
+        moveDetailsMap = new Map();
     }
 }
 

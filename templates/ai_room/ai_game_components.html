@@ -1,88 +1,32 @@
-<style>
-#piece-action-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(250, 246, 239, 0.98);
-    padding: 30px 40px;
-    border: 4px solid var(--ink-brown);
-    border-radius: 16px;
-    z-index: 6000;
-    text-align: center;
-    box-shadow: 0 0 60px rgba(74, 124, 155, 0.5);
-    font-family: 'KaiTi', 'STKaiti', 'FangSong', serif;
-    min-width: 320px;
-}
-
-#piece-action-modal .modal-title {
-    color: var(--ink-brown);
-    margin: 0 0 20px 0;
-    font-size: 24px;
-    letter-spacing: 3px;
-}
-
-#piece-action-modal .modal-info {
-    color: var(--ink-dark);
-    margin: 0 0 25px 0;
-    font-size: 16px;
-}
-
-#piece-action-modal .modal-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-#piece-action-modal .modal-buttons button {
-    padding: 12px 30px;
-    font-size: 18px;
-    font-family: 'KaiTi', serif;
-    border-radius: 8px;
-    cursor: pointer;
-    letter-spacing: 3px;
-    min-width: 120px;
-    border: 2px solid var(--ink-brown);
-}
-
-#piece-action-modal .modal-buttons .btn-move {
-    background: linear-gradient(135deg, #4a7c59 0%, #3d6b4a 100%);
-    color: white;
-}
-
-#piece-action-modal .modal-buttons .btn-attack {
-    background: linear-gradient(135deg, var(--ink-red) 0%, #6b1d00 100%);
-    color: white;
-}
-
-#piece-action-modal .modal-buttons .btn-cancel {
-    background: linear-gradient(135deg, #888 0%, #666 100%);
-    color: white;
-}
-
-#piece-action-modal .modal-hint {
-    color: #888;
-    font-size: 14px;
-    margin: 15px 0 0 0;
-}
-</style>
-
 <div id="combat-modal">
     <h2 id="combat-result"></h2>
     <div id="combat-details"></div>
     <button id="combat-confirm-btn" onclick="dismissCombatModal()">确 定</button>
 </div>
 
-<div id="piece-action-modal" style="display: none;">
-    <h2 id="piece-action-title" class="modal-title"></h2>
-    <div id="piece-action-info" class="modal-info"></div>
-    <div class="modal-buttons">
-        <button id="btn-action-move" class="btn-move" onclick="selectPieceAction('move')">移动</button>
-        <button id="btn-action-attack" class="btn-attack" onclick="selectPieceAction('attack')">攻击</button>
-        <button class="btn-cancel" onclick="cancelPieceAction()">取消</button>
+<div id="piece-action-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(250, 246, 239, 0.98); padding:40px; border:4px solid var(--ink-brown); border-radius:16px; z-index:7000; text-align:center; box-shadow: 0 0 60px rgba(74, 124, 155, 0.5); font-family: 'KaiTi', 'STKaiti', 'FangSong', serif;">
+    <h2 style="color:var(--ink-brown); margin:0 0 20px 0; font-size:28px; letter-spacing:5px;">棋子动作</h2>
+    <p id="piece-action-desc" style="color:var(--ink-dark); margin:0 0 15px 0; font-size:16px;"></p>
+    <div id="move-cost-info" style="background:rgba(74, 124, 89, 0.1); border:2px solid var(--ink-brown); border-radius:8px; padding:15px; margin:0 0 25px 0; font-size:14px; color:var(--ink-dark);"></div>
+    <div style="display:flex; justify-content:center; gap:20px;">
+        <button id="btn-select-move" onclick="selectAction('move')" style="background:linear-gradient(135deg, #4a7c59 0%, #3d6b4a 100%); color:white; border:2px solid var(--ink-brown); padding:15px 35px; font-size:18px; font-family: 'KaiTi', serif; border-radius:8px; cursor:pointer; letter-spacing:3px; min-width:140px;">移动</button>
+        <button id="btn-select-attack" onclick="selectAction('attack')" style="background:linear-gradient(135deg, var(--ink-red) 0%, #6b1d00 100%); color:white; border:2px solid var(--ink-brown); padding:15px 35px; font-size:18px; font-family: 'KaiTi', serif; border-radius:8px; cursor:pointer; letter-spacing:3px; min-width:140px;">攻击</button>
+        <button id="btn-select-terrain" onclick="selectAction('terrain')" style="background:linear-gradient(135deg, #8B4513 0%, #654321 100%); color:white; border:2px solid var(--ink-brown); padding:15px 35px; font-size:18px; font-family: 'KaiTi', serif; border-radius:8px; cursor:pointer; letter-spacing:3px; min-width:140px;">修改地形</button>
     </div>
-    <p class="modal-hint">点击空白处或按 ESC 键也可取消选择</p>
+    <button onclick="cancelAction()" style="margin-top:25px; background:transparent; color:var(--ink-brown); border:2px solid var(--ink-brown); padding:10px 25px; font-size:16px; font-family: 'KaiTi', serif; border-radius:8px; cursor:pointer; letter-spacing:2px;">取消</button>
+</div>
+
+<div id="terrain-change-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(250, 246, 239, 0.98); padding:40px; border:4px solid var(--ink-brown); border-radius:16px; z-index:8000; text-align:center; box-shadow: 0 0 60px rgba(139, 69, 19, 0.5); font-family: 'KaiTi', 'STKaiti', 'FangSong', serif;">
+    <h2 style="color:var(--ink-brown); margin:0 0 20px 0; font-size:28px; letter-spacing:5px;">修改地形高度</h2>
+    <p id="terrain-change-desc" style="color:var(--ink-dark); margin:0 0 15px 0; font-size:16px;"></p>
+    <div style="margin:20px 0;">
+        <label style="font-size:16px; color:var(--ink-dark);">选择高度变化：</label>
+        <div style="display:flex; justify-content:center; gap:10px; margin-top:15px;">
+            <button id="btn-terrain-lower" onclick="applyTerrainChange(-1)" style="background:linear-gradient(135deg, #4a7c59 0%, #3d6b4a 100%); color:white; border:2px solid var(--ink-brown); padding:12px 25px; font-size:18px; font-family: 'KaiTi', serif; border-radius:8px; cursor:pointer;">降低 1</button>
+            <button id="btn-terrain-raise" onclick="applyTerrainChange(1)" style="background:linear-gradient(135deg, var(--ink-red) 0%, #6b1d00 100%); color:white; border:2px solid var(--ink-brown); padding:12px 25px; font-size:18px; font-family: 'KaiTi', serif; border-radius:8px; cursor:pointer;">升高 1</button>
+        </div>
+    </div>
+    <button onclick="closeTerrainChangeModal()" style="margin-top:20px; background:transparent; color:var(--ink-brown); border:2px solid var(--ink-brown); padding:10px 25px; font-size:16px; font-family: 'KaiTi', serif; border-radius:8px; cursor:pointer; letter-spacing:2px;">取消</button>
 </div>
 
 <div id="restore-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(250, 246, 239, 0.98); padding:50px; border:4px solid var(--ink-brown); border-radius:16px; z-index:8000; text-align:center; box-shadow: 0 0 60px rgba(74, 124, 155, 0.5); font-family: 'KaiTi', 'STKaiti', 'FangSong', serif;">
@@ -100,9 +44,9 @@
     <div id="strategy-card-buttons" style="display:flex; justify-content:center; gap:20px;"></div>
 </div>
 
-<div id="roll-animation" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(250, 246, 239, 0.98); padding:40px; border:4px solid var(--ink-brown); border-radius:12px; z-index:2100; text-align:center; box-shadow: 0 0 40px rgba(74, 124, 155, 0.4);">
+<div id="roll-animation" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(250, 246, 239, 0.98); padding:10px; border:4px solid var(--ink-brown); border-radius:12px; z-index:2100; text-align:center; box-shadow: 0 0 40px rgba(74, 124, 155, 0.4); max-width:90%;">
     <h2 id="roll-title" style="color: var(--ink-brown); margin-top:0; font-size:24px;">🎲 掷采中...</h2>
-    <div id="dice-animation" style="display:flex; justify-content:center; gap:10px; margin:30px 0;"></div>
+    <div id="dice-animation" style="display:flex; justify-content:center; gap:30px; margin:10px 0;"></div>
 </div>
 
 <div id="zero-roll-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(250, 246, 239, 0.98); padding:50px; border:4px solid var(--ink-brown); border-radius:16px; z-index:6000; text-align:center; box-shadow: 0 0 60px rgba(74, 124, 155, 0.5);">
@@ -111,4 +55,171 @@
     <p style="color: var(--ink-brown); margin:0 0 30px 0; font-size:18px; font-family: 'KaiTi', serif;">掷采为零，此回合无步可用</p>
     <p style="color: var(--ink-dark); margin:0 0 30px 0; font-size:16px; font-family: 'KaiTi', serif;">莫丧锐气，胜负未分</p>
     <button onclick="closeZeroRollModal()" style="background:linear-gradient(135deg, var(--ink-red) 0%, #6b1d00 100%); color:white; border:2px solid var(--ink-brown); padding:12px 40px; font-size:18px; font-family: 'KaiTi', serif; border-radius:8px; cursor:pointer; letter-spacing:3px;">继续战斗</button>
+</div>
+
+<div id="turn-announcement" class="turn-announcement">
+    <div class="ink-drip"></div>
+</div>
+
+<div id="welcome-screen" class="welcome-screen show">
+    <div class="welcome-content">
+        <h1 class="welcome-title">六博对弈</h1>
+        <p class="welcome-subtitle">水墨丹青 · 棋局万千</p>
+        <div class="welcome-divider"></div>
+        <p class="welcome-info">红方先行 · 以采定步</p>
+        <button id="btn-start-game" class="btn-start-game">开始对弈</button>
+    </div>
+</div>
+
+<div id="game-start-announcement" class="game-start-announcement" data-text="游戏开始">
+    游戏开始
+</div>
+
+<div class="mobile-overlay" id="mobile-overlay"></div>
+
+<button class="mobile-nav-toggle rules-toggle" id="mobile-rules-toggle" aria-label="打开规则面板">📖</button>
+<button class="mobile-nav-toggle info-toggle" id="mobile-info-toggle" aria-label="打开信息面板">📜</button>
+
+<div class="game-layout">
+    <div class="game-sidebar rules-sidebar">
+        <h3>📖 游戏规则</h3>
+        <div class="rules-content">
+            <details>
+                <summary><strong>🎯 胜利条件</strong></summary>
+                <p>通过战斗和策略，击败对方的核心棋子（枭）。枭被吃掉时，游戏结束。</p>
+            </details>
+
+            <details>
+                <summary><strong>🎮 操作说明</strong></summary>
+                <p><strong>回合流程：</strong></p>
+                <p>1. 点击「🎲 掷采」按钮掷骰子</p>
+                <p>2. 掷采结果决定本回合可用步数</p>
+                <p>3. 点击己方棋子显示可移动/攻击范围</p>
+                <p>4. 点击绿色区域移动棋子</p>
+                <p>5. 点击红色区域进入战斗</p>
+                <p>6. 点击紫色区域进行远程攻击</p>
+                <p>7. 战斗后点击「确定」继续</p>
+                <p>8. 步数耗尽可继续远程攻击</p>
+                <p>9. 点击「跳过回合」结束本回合</p>
+            </details>
+
+            <details>
+                <summary><strong>♟️ 棋子说明</strong></summary>
+                <p><strong>工(G)</strong> 移动3格，近战1格，攻0.7倍，防1倍，可修改地形高度</p>
+                <p><strong>炮(P)</strong> 移动1格，近战1格，远程3格，攻1.5倍，可远程攻击并降低地形</p>
+                <p><strong>骑(Q)</strong> 移动7格，近战1格，攻1.5倍，防0.9倍，移动成本0.5</p>
+                <p><strong>散(S)</strong> 移动4格，近战1格，攻1倍，防1倍，最基础的步兵</p>
+                <p><strong>矢(T)</strong> 移动4格，近战1格，远程3格，攻1.2倍，基础远程单位</p>
+                <p><strong>枭(X)</strong> 移动1格，近战1格，攻1.3倍，防1倍，首领单位，被吃则游戏结束</p>
+                <p style="color:#888; font-size:12px;">远程攻击距离2格时威力最大；近战攻击距离1格</p>
+            </details>
+
+            <details>
+                <summary><strong>📍 地形与高度</strong></summary>
+                <p><strong>平原</strong> 移动成本1.0，战斗加成1.0</p>
+                <p><strong>水域</strong> 移动成本2.0，战斗加成0.8</p>
+                <p><strong>山地</strong> 移动成本2.0，战斗加成1.2</p>
+                <p><strong>城墙</strong> 禁止移动</p>
+                <p><strong>高度影响：</strong></p>
+                <p>• 相邻高度差超过1无法移动</p>
+                <p>• 高处攻击低处：攻击力+50%</p>
+                <p>• 向上移动成本增加</p>
+                <p>• 向下移动成本降低</p>
+                <p>• 远程范围 = 基础范围 + (当前高度 - 目标高度)</p>
+                <p>• 高度范围：-1（低洼）到 3（高山）</p>
+            </details>
+
+            <details>
+                <summary><strong>⚔️ 战斗系统</strong></summary>
+                <p><strong>触发条件：</strong>移动到敌方棋子所在格子，或远程攻击敌方棋子</p>
+                <p><strong>战斗流程：</strong></p>
+                <p>1. 双方各掷采（6枚筹子生成6位二进制数）</p>
+                <p>2. 计算战力：掷采值 × 倍率</p>
+                <p>3. 战力高者获胜，留在格子</p>
+                <p>4. 战力低者被移除</p>
+                <p><strong>连携攻击：</strong></p>
+                <p>Total = (Σ连携倍率) × [1 + k × (N + T - 2)]</p>
+                <p>k：连携系数，每10回合+0.1</p>
+                <p>N：连携棋子数量，T：连携棋子类型数</p>
+            </details>
+
+            <details>
+                <summary><strong>🎴 锦囊系统</strong></summary>
+                <p><strong>对战锦囊（战斗前使用）：</strong></p>
+                <p>二位定一：战力>16，共7张</p>
+                <p>首位定一：战力>32，共5张</p>
+                <p>双星高照：战力>48，共3张</p>
+                <p>三阳开泰：战力>56，共2张</p>
+                <p><strong>招募锦囊（自动获得）：</strong></p>
+                <p>战斗失败方随机获得招募牌</p>
+                <p>70%概率招募低倍率棋子(base<1.5)</p>
+                <p>30%概率招募高倍率棋子(base≥1.5)</p>
+                <p>60%概率招募近程，40%概率招募远程</p>
+            </details>
+
+            <details>
+                <summary><strong>💡 策略提示</strong></summary>
+                <p>• 保护枭是首要任务</p>
+                <p>• 远程单位保持2-3格距离最佳</p>
+                <p>• 利用高处地形获得战斗优势</p>
+                <p>• 集中火力击杀敌方枭</p>
+                <p>• 工(G)可修改地形配合战术</p>
+                <p>• 步数耗尽后仍可远程攻击</p>
+            </details>
+        </div>
+    </div>
+
+    <div class="game-board-container">
+        <div id="game-board"></div>
+    </div>
+    
+    <button class="mobile-skip-btn" id="mobile-btn-skip">跳过回合</button>
+    
+    <div class="game-sidebar info-sidebar">
+        <h3>📜 对战信息 <span id="current-turn-indicator"></span></h3>
+        <div class="players-display">
+            <div class="player-row red-side">
+                <span class="side-indicator red">红</span>
+                <span class="side-name">{{ p1_name }}</span>
+                <span class="side-steps" id="red-steps"></span>
+            </div>
+            <div class="player-row black-side">
+                <span class="side-indicator black">黑</span>
+                <span class="side-name">{{ p2_name }}</span>
+                <span class="side-steps" id="black-steps"></span>
+                <span class="ai-status-indicator" id="ai-status-inline">等待中</span>
+            </div>
+        </div>
+        
+        <div class="strategy-cards-container">
+            <div class="strategy-cards-title">🎴 战斗锦囊</div>
+            <div class="strategy-cards-grid">
+                <div class="strategy-card" id="card-erwei" onclick="selectStrategyCard('erwei')">
+                    <span class="strategy-card-name">二位定一</span>
+                    <span class="strategy-card-count" id="count-erwei">7</span>
+                    <span class="strategy-card-effect">战力>16</span>
+                </div>
+                <div class="strategy-card" id="card-shouwei" onclick="selectStrategyCard('shouwei')">
+                    <span class="strategy-card-name">首位定一</span>
+                    <span class="strategy-card-count" id="count-shouwei">5</span>
+                    <span class="strategy-card-effect">战力>32</span>
+                </div>
+                <div class="strategy-card" id="card-shuangxing" onclick="selectStrategyCard('shuangxing')">
+                    <span class="strategy-card-name">双星高照</span>
+                    <span class="strategy-card-count" id="count-shuangxing">3</span>
+                    <span class="strategy-card-effect">战力>48</span>
+                </div>
+                <div class="strategy-card" id="card-sanyang" onclick="selectStrategyCard('sanyang')">
+                    <span class="strategy-card-name">三阳开泰</span>
+                    <span class="strategy-card-count" id="count-sanyang">2</span>
+                    <span class="strategy-card-effect">战力>56</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="button-row" style="margin-top: 10px;">
+            <button id="btn-skip-turn" onclick="skipTurn()" class="btn-secondary">跳过回合</button>
+            <button id="btn-toggle-sound" onclick="toggleSound()" class="btn-secondary btn-sound-on">🔊</button>
+        </div>
+    </div>
 </div>

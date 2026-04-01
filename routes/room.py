@@ -84,7 +84,11 @@ def ai_room_view():
         'p2_name': 'AI',
         'user': current_user if current_user.is_authenticated else None,
         'player_id': player_id,
-        'map_name': map_name
+        'map_name': map_name,
+        'config': {
+            'RED_PICTURE': Config.RED_PICTURE,
+            'BLACK_PICTURE': Config.BLACK_PICTURE
+        }
     }
 
     return render_template('ai_game.html', **context)

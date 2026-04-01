@@ -2124,6 +2124,53 @@
         -webkit-overflow-scrolling: touch;
     }
 
+    #btn-select-move:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(74, 124, 89, 0.5);
+    }
+
+    #btn-select-attack:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(139, 37, 0, 0.5);
+    }
+
+    #btn-select-move:disabled, #btn-select-attack:disabled, #btn-select-terrain:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    #btn-select-terrain:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(139, 69, 19, 0.5);
+    }
+
+    .cell.terrain-change-target {
+        background-color: rgba(139, 69, 19, 0.4) !important;
+        box-shadow: inset 0 0 25px rgba(139, 69, 19, 0.5);
+        animation: terrainChangeGlow 1.5s ease-in-out infinite;
+        cursor: pointer;
+    }
+
+    .cell.terrain-change-target:hover {
+        background-color: rgba(139, 69, 19, 0.65) !important;
+        box-shadow: inset 0 0 40px rgba(139, 69, 19, 0.7), 0 0 25px rgba(139, 69, 19, 0.5);
+        transform: scale(1.05);
+        z-index: 10;
+    }
+
+    @keyframes terrainChangeGlow {
+        0%, 100% { box-shadow: inset 0 0 25px rgba(139, 69, 19, 0.5); }
+        50% { box-shadow: inset 0 0 35px rgba(139, 69, 19, 0.7); }
+    }
+
+    .terrain-change-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+    }
+
     @media (max-width: 768px) {
         .game-board-wrapper {
             justify-content: flex-start;

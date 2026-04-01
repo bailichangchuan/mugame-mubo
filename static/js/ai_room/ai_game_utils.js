@@ -33,8 +33,8 @@ function isRangedPiece(piece) {
 
 function getRangedAttackRange(piece) {
     if (!piece) return 0;
-    if (gameState.piece_types?.[piece.type]?.attack_range) {
-        return gameState.piece_types[piece.type].attack_range;
+    if (gameState.piece_types?.[piece.type]?.combat_range) {
+        return gameState.piece_types[piece.type].combat_range;
     }
     return 2;
 }
@@ -91,27 +91,36 @@ function calculatePathCost(fromPos, toPos, gameState, piece) {
     const numRows = board.length;
     const numCols = board[0].length;
     const terrainHeight = gameState.terrain?.height;
+    const terrainType = gameState.terrain?.type;
+    const terrainTypes = gameState.terrain_types;
+    const pieceTypes = gameState.piece_types;
     const dr = [1, -1, 0, 0];
     const dc = [0, 0, 1, -1];
     
-    function getHeightCost(row, col, prevRow, prevCol) {
-        if (!terrainHeight) return 1;
+    const pieceMoveCost = piece && pieceTypes?.[piece.type]?.move_cost || 1;
+    
+    function getCellMoveCost(row, col, prevRow, prevCol) {
+        let cellCost = pieceMoveCost;
         
-        const currentHeight = terrainHeight[row]?.[col] || 0;
-        
-        if (prevRow === null || prevCol === null) {
-            return 1;
+        if (terrainType && terrainTypes) {
+            const tType = terrainType[row]?.[col];
+            if (tType && terrainTypes[tType]) {
+                const terrainMoveCost = terrainTypes[tType].move_cost || 1;
+                cellCost *= terrainMoveCost;
+            }
         }
         
-        const prevHeight = terrainHeight[prevRow]?.[prevCol] || 0;
-        const heightDiff = currentHeight - prevHeight;
-        
-        if (heightDiff > 0) {
-            return 1 + heightDiff;
-        } else if (heightDiff < 0) {
-            return Math.max(1, 1 + heightDiff);
+        if (terrainHeight && (prevRow !== null && prevCol !== null)) {
+            const currentHeight = terrainHeight[row]?.[col] || 0;
+            const prevHeight = terrainHeight[prevRow]?.[prevCol] || 0;
+            const heightDiff = currentHeight - prevHeight;
+            
+            if (heightDiff > 0) {
+                cellCost += heightDiff;
+            }
         }
-        return 1;
+        
+        return cellCost;
     }
     
     const queue = [[fromCol, fromRow, 0, [], null, null]];
@@ -128,22 +137,22 @@ function calculatePathCost(fromPos, toPos, gameState, piece) {
             if (nextCol < 0 || nextCol >= numCols || nextRow < 0 || nextRow >= numRows) continue;
             
             if (nextRow === toRow && nextCol === toCol) {
-                const stepCost = getHeightCost(nextRow, nextCol, row, col);
+                const stepCost = getCellMoveCost(nextRow, nextCol, row, col);
                 const nextCost = cost + stepCost;
-                return { cost: nextCost, path: [...path, { row: nextRow, col: nextCol, heightCost: stepCost }] };
+                return { cost: nextCost, path: [...path, { row: nextRow, col: nextCol, moveCost: stepCost }] };
             }
             
             const target = board[nextRow][nextCol];
             if (target) continue;
             
-            const stepCost = getHeightCost(nextRow, nextCol, row, col);
+            const stepCost = getCellMoveCost(nextRow, nextCol, row, col);
             const nextCost = cost + stepCost;
             
             const prevCost = visited.get(`${nextCol},${nextRow}`) || Infinity;
             
             if (nextCost < prevCost) {
                 visited.set(`${nextCol},${nextRow}`, nextCost);
-                queue.push([nextCol, nextRow, nextCost, [...path, { row: nextRow, col: nextCol, heightCost: stepCost }], col, row]);
+                queue.push([nextCol, nextRow, nextCost, [...path, { row: nextRow, col: nextCol, moveCost: stepCost }], col, row]);
             }
         }
     }
@@ -164,6 +173,9 @@ function getMoveRange(piece, pos, stepsLeft, gameState) {
     const numRows = board.length;
     const numCols = board[0].length;
 
+    const pieceTypes = gameState.piece_types;
+    const pieceMoveRange = pieceTypes?.[piece.type]?.move_range || Infinity;
+
     const ranged = isRangedPiece(piece);
     const rangedTargets = ranged ? getRangedAttackTargets(piece, pos, gameState) : [];
 
@@ -172,7 +184,7 @@ function getMoveRange(piece, pos, stepsLeft, gameState) {
             if (targetRow === row && targetCol === col) continue;
 
             const dist = Math.abs(targetRow - row) + Math.abs(targetCol - col);
-            if (dist > stepsLeft) continue;
+            if (dist > pieceMoveRange) continue;
 
             const toPos = [targetCol, targetRow];
             const target = board[targetRow][targetCol];
@@ -228,6 +240,8 @@ function getMoveInfo(row, col) {
     }
     return null;
 }
+
+let moveDetailsMap = new Map();
 
 function getFarthestInDirection(fromCol, fromRow, toCol, toRow) {
     const dCol = Math.sign(toCol - fromCol);
