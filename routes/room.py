@@ -53,8 +53,7 @@ def room_view(room_id):
         template = get_skin_template_path('waiting.html', request)
         return render_template(template, **context)
     else:
-        template = get_skin_template_path('game.html', request)
-        return render_template(template, **context)
+        return render_template('mubo/game.html', **context)
 
 @room_bp.route('/ai-room')
 def ai_room_view():
