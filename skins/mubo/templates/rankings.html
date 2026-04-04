@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}用户排名 - 博棋{% endblock %}
+
+{% block content %}
+<div style="margin-top: 100px;">
+    <h1>博棋 · 用户排名</h1>
+    <p>欢迎, {{ user.username }}</p>
+    
+    <div style="margin: 20px;">
+        <h2>排行榜</h2>
+        <table style="border-collapse: collapse; width: 100%; margin-top: 10px;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">排名</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">用户名</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">游戏次数</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">获胜次数</th>
+                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">胜率</th>
+                </tr>
+            </thead>
+            <tbody id="rankings-body">
+                <tr>
+                    <td colspan="5" style="border: 1px solid #ddd; padding: 8px; text-align: center;">加载中...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="margin: 20px;">
+        <button onclick="window.location.href='/game/bo/'">返回大厅</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 页面加载时获取排名数据
+    window.onload = function() {
+        fetch('/game/bo/api/user-rankings')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const rankingsBody = document.getElementById('rankings-body');
+                    rankingsBody.innerHTML = '';
+                    
+                    data.rankings.forEach(item => {
+                        const row = document.createElement('tr');
+                        
+                        // 设置排名单元格的样式，前三名有特殊样式
+                        const rankCell = document.createElement('td');
+                        rankCell.style.border = '1px solid #ddd';
+                        rankCell.style.padding = '8px';
+                        rankCell.style.fontWeight = 'bold';
+                        
+                        if (item.rank === 1) {
+                            rankCell.style.color = 'gold';
+                            rankCell.style.backgroundColor = '#fff9c4';
+                        } else if (item.rank === 2) {
+                            rankCell.style.color = 'silver';
+                            rankCell.style.backgroundColor = '#f5f5f5';
+                        } else if (item.rank === 3) {
+                            rankCell.style.color = '#cd7f32';
+                            rankCell.style.backgroundColor = '#fff3e0';
+                        }
+                        
+                        rankCell.textContent = item.rank;
+                        row.appendChild(rankCell);
+                        
+                        // 其他单元格
+                        const usernameCell = document.createElement('td');
+                        usernameCell.style.border = '1px solid #ddd';
+                        usernameCell.style.padding = '8px';
+                        usernameCell.textContent = item.username;
+                        row.appendChild(usernameCell);
+                        
+                        const gamesPlayedCell = document.createElement('td');
+                        gamesPlayedCell.style.border = '1px solid #ddd';
+                        gamesPlayedCell.style.padding = '8px';
+                        gamesPlayedCell.textContent = item.games_played;
+                        row.appendChild(gamesPlayedCell);
+                        
+                        const gamesWonCell = document.createElement('td');
+                        gamesWonCell.style.border = '1px solid #ddd';
+                        gamesWonCell.style.padding = '8px';
+                        gamesWonCell.textContent = item.games_won;
+                        row.appendChild(gamesWonCell);
+                        
+                        const winRateCell = document.createElement('td');
+                        winRateCell.style.border = '1px solid #ddd';
+                        winRateCell.style.padding = '8px';
+                        winRateCell.textContent = item.win_rate + '%';
+                        row.appendChild(winRateCell);
+                        
+                        rankingsBody.appendChild(row);
+                    });
+                } else {
+                    const rankingsBody = document.getElementById('rankings-body');
+                    rankingsBody.innerHTML = '<tr><td colspan="5" style="border: 1px solid #ddd; padding: 8px; text-align: center; color: red;">加载失败: ' + data.msg + '</td></tr>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const rankingsBody = document.getElementById('rankings-body');
+                rankingsBody.innerHTML = '<tr><td colspan="5" style="border: 1px solid #ddd; padding: 8px; text-align: center; color: red;">加载失败，请刷新页面重试</td></tr>';
+            });
+    };
+</script>
+{% endblock %}

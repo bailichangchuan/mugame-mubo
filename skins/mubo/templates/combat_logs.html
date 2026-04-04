@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}战斗记录 - 房间 {{ room.id }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .container {
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .combat-logs-container {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        overflow-x: auto;
+        padding-bottom: 20px;
+    }
+    .combat-log {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        min-width: 400px;
+        max-width: 400px;
+        box-sizing: border-box;
+        flex-shrink: 0;
+    }
+    .combat-log-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    .combat-log-body {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .combatant {
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    .attacker {
+        background: #f8f9fa;
+    }
+    .defender {
+        background: #e9ecef;
+    }
+    .sticks {
+        display: flex;
+        gap: 5px;
+        margin: 10px 0;
+        justify-content: center;
+    }
+    .stick {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        font-size: 12px;
+    }
+    .stick-1 {
+        background: red;
+        color: white;
+    }
+    .stick-0 {
+        background: black;
+        color: white;
+    }
+    .result {
+        text-align: center;
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+    .result-winner {
+        background: #d4edda;
+        color: #155724;
+    }
+    .result-draw {
+        background: #fff3cd;
+        color: #856404;
+    }
+    .result-defender {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    .turn-title {
+        margin-top: 30px;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #007bff;
+    }
+    .piece-type {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-left: 5px;
+    }
+    .piece-X {
+        background: #ff6b6b;
+        color: white;
+    }
+    .piece-S {
+        background: #4ecdc4;
+        color: white;
+    }
+    .piece-T {
+        background: #45b7d1;
+        color: white;
+    }
+    .piece-P {
+        background: #96ceb4;
+        color: white;
+    }
+    .piece-G {
+        background: #feca57;
+        color: #333;
+    }
+    .card-used {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        background: #ffeaa7;
+        color: #d63031;
+        margin-top: 5px;
+    }
+    .combat-sequence {
+        color: #007bff;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>战斗记录 - 房间 {{ room.id }}</h1>
+        <p>红方: {{ player1.username }} vs 黑方: {{ player2.username if player2 else '等待加入...' }}</p>
+        
+        {% if combat_logs %}
+            <div class="combat-logs-container">
+                {% for log in combat_logs %}
+                    <div class="combat-log">
+                        <div class="combat-log-header">
+                            <h3>第 <span class="combat-sequence">{{ log.combat_sequence }}</span> 场战斗</h3>
+                            <span>{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                        </div>
+                        <div class="combat-log-body">
+                            <div class="combatant attacker">
+                                <h4>
+                                    进攻方
+                                    <span class="piece-name" data-type="{{ log.attacker_piece }}">{{ log.attacker_piece }}</span>
+                                </h4>
+                                <p>用户: {{ player1.username if log.attacker_id == player1.id else player2.username }}</p>
+                                {% if log.attacker_card %}
+                                    <p class="card-used">锦囊: {{ log.attacker_card }}</p>
+                                {% endif %}
+                                <p>抽签结果:</p>
+                                <div class="sticks">
+                                    {% for stick in log.get_attacker_sticks() %}
+                                        <div class="stick stick-{{ stick }}">{{ stick }}</div>
+                                    {% endfor %}
+                                </div>
+                                <p>二进制: {{ log.attacker_binary }}</p>
+                                <p>最终战力: {{ log.attacker_power }}</p>
+                            </div>
+                            <div class="combatant defender">
+                                <h4>
+                                    防守方
+                                    <span class="piece-name" data-type="{{ log.defender_piece }}">{% if log.defender_piece %}{{ log.defender_piece }}{% else %}无{% endif %}</span>
+                                </h4>
+                                <p>用户: {{ player1.username if log.defender_id == player1.id else player2.username }}</p>
+                                {% if log.defender_card %}
+                                    <p class="card-used">锦囊: {{ log.defender_card }}</p>
+                                {% endif %}
+                                <p>抽签结果:</p>
+                                <div class="sticks">
+                                    {% for stick in log.get_defender_sticks() %}
+                                        <div class="stick stick-{{ stick }}">{{ stick }}</div>
+                                    {% endfor %}
+                                </div>
+                                <p>二进制: {{ log.defender_binary }}</p>
+                                <p>最终战力: {{ log.defender_power }}</p>
+                            </div>
+                        </div>
+                        <div class="result {% if log.winner == 'attacker' %}result-winner{% elif log.winner == 'draw' %}result-draw{% else %}result-defender{% endif %}">
+                            {% if log.winner == 'attacker' %}
+                                进攻成功！
+                            {% elif log.winner == 'draw' %}
+                                进攻失败！
+                            {% else %}
+                                防守反杀！
+                            {% endif %}
+                            (攻击距离: {{ log.distance }})
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>暂无战斗记录</p>
+        {% endif %}
+        
+        <div style="margin-top: 30px;">
+            <a href="{{ url_for('room.room_view', room_id=room.id) }}" class="btn btn-primary">返回游戏</a>
+            <a href="{{ url_for('room.index') }}" class="btn btn-secondary">返回首页</a>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAndReplacePieceNames();
+        });
+
+        function loadAndReplacePieceNames() {
+            const request = indexedDB.open('GameDB');
+
+            request.onerror = function(event) {
+                console.error('IndexedDB 读取失败，尝试从后端获取...', event.target.error);
+                fetchPieceTypesFromAPI();
+            };
+
+            request.onsuccess = function(event) {
+                const db = event.target.result;
+                // 检查是否存在对应的存储对象
+                if (!db.objectStoreNames.contains('game_data')) {
+                    fetchPieceTypesFromAPI();
+                    return;
+                }
+
+                try {
+                    const transaction = db.transaction(['game_data'], 'readonly');
+                    const store = transaction.objectStore('game_data');
+                    const getRequest = store.get('piece_types');
+
+                    getRequest.onsuccess = function(e) {
+                        const pieceTypes = e.target.result;
+                        if (pieceTypes) {
+                            updatePieceNamesOnPage(pieceTypes);
+                        } else {
+                            fetchPieceTypesFromAPI();
+                        }
+                    };
+                    getRequest.onerror = function() {
+                        fetchPieceTypesFromAPI();
+                    };
+                } catch (e) {
+                    console.error('事务错误:', e);
+                    fetchPieceTypesFromAPI();
+                }
+            };
+        }
+
+        // 如果本地数据库没有，则向后端请求
+        function fetchPieceTypesFromAPI() {
+            fetch('/game/bo/api/get-piece-types')
+                .then(response => response.json())
+                .then(data => {
+                    updatePieceNamesOnPage(data);
+                    // 顺手将其存入 IndexedDB 供下次使用
+                    const request = indexedDB.open('GameDB');
+                    request.onsuccess = function(event) {
+                        const db = event.target.result;
+                        if (db.objectStoreNames.contains('game_data')) {
+                            const transaction = db.transaction(['game_data'], 'readwrite');
+                            const store = transaction.objectStore('game_data');
+                            store.put(data, 'piece_types');
+                        }
+                    };
+                })
+                .catch(error => console.error('获取棋子数据失败:', error));
+        }
+
+// 核心渲染函数：把页面上的字母替换为真正的棋子名称 (精准适配版)
+        function updatePieceNamesOnPage(pieceTypesData) {
+            console.log("从后端接收到的真实数据:", pieceTypesData);
+
+            const pieceMap = {};
+            
+            // 1. 剥开外壳，直接定位到包含 "G", "Q" 的真正字典
+            let actualData = pieceTypesData;
+            if (pieceTypesData.piece_types) {
+                actualData = pieceTypesData.piece_types;
+            } else if (pieceTypesData.data) {
+                actualData = pieceTypesData.data;
+            }
+
+            // 2. 遍历这个真正的字典，提取映射关系
+            // actualData 现在的样子是 { "G": {name: "工", ...}, "Q": {...} }
+            for (let key in actualData) {
+                let item = actualData[key];
+                if (item && typeof item === 'object' && item.name) {
+                    pieceMap[key] = item.name;
+                }
+            }
+
+            // 调试用：你可以在控制台看看字典是否成功生成了类似 {G: "工", Q: "弓箭手"} 的格式
+            console.log("提取出的匹配字典:", pieceMap); 
+
+            // 3. 开始替换页面上的 HTML
+            const nameSpans = document.querySelectorAll('.piece-name');
+            nameSpans.forEach(span => {
+                const typeId = span.getAttribute('data-type');
+                
+                // 排除空值或后端的 None 字符
+                if (typeId && typeId !== 'None' && typeId.trim() !== '') {
+                    // 如果字典里有这个 ID 的名字，就执行替换
+                    if (pieceMap[typeId]) {
+                        span.textContent = pieceMap[typeId] + ' (' + typeId + ')';
+                    }
+                }
+            });
+        }
+    </script>
+{% endblock %}

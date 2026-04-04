@@ -2,29 +2,36 @@ from flask import Blueprint, render_template, redirect, url_for, jsonify, reques
 from flask_login import login_required, current_user
 from flask_socketio import emit, join_room
 from extensions import db, socketio
-from config import Config  # 修改这一行
+from config import Config
 from models import GameRoom, User, CombatLog
 from map_loader import MapLoader, MapData
+import os
 import random
 
-# 然后在使用的地方修改为
-CARD_CONFIG = Config.CARD_CONFIG  # 添加这一行
+CARD_CONFIG = Config.CARD_CONFIG
 
 room_bp = Blueprint('room', __name__, url_prefix='/game/bo')
+
+def get_skin_template_path(template_name, request):
+    """根据用户皮肤选择返回模板路径"""
+    skin = request.cookies.get('skin', 'default')
+    if skin == 'mubo':
+        return f'mubo/{template_name}'
+    return template_name
 
 # --- 页面路由 (HTTP View) ---
 
 @room_bp.route('/')
 def index():
     """首页：显示创建和加入表单"""
-    # if not current_user.is_authenticated:
-    #     return redirect('/game/bo/login')
-    return render_template('home.html', user=current_user)
+    template = get_skin_template_path('home.html', request)
+    return render_template(template, user=current_user)
 
 @room_bp.route('/guide')
 def game_guide():
     """游戏说明页面"""
-    return render_template('game_guide.html')
+    template = get_skin_template_path('game_guide.html', request)
+    return render_template(template)
 
 @room_bp.route('/room/<int:room_id>')
 @login_required
@@ -32,7 +39,6 @@ def room_view(room_id):
     """房间页：根据状态分发到 等待页 或 游戏页"""
     room = GameRoom.query.get_or_404(room_id)
     
-    # 获取双方名字用于显示
     p1 = User.query.get(room.player1_id)
     p2 = User.query.get(room.player2_id) if room.player2_id else None
 
@@ -44,33 +50,57 @@ def room_view(room_id):
     }
 
     if room.status == 'waiting':
-        return render_template('waiting.html', **context)
+        template = get_skin_template_path('waiting.html', request)
+        return render_template(template, **context)
     else:
-        # 游戏进行中或已结束，渲染游戏页
-        return render_template('game.html', **context)
+        return render_template('mubo/game.html', **context)
 
-@room_bp.route('/ai-room/<int:room_id>')
-@login_required
-def ai_room_view(room_id):  # 修改函数名
-    """AI房间页：根据状态分发到 等待页 或 游戏页"""
-    room = GameRoom.query.get_or_404(room_id)
+@room_bp.route('/ai-room')
+def ai_room_view():
+    """AI对战专用页面"""
+    map_name = request.args.get('map', 'default_map')
     
-    # 获取双方名字用于显示
-    p1 = User.query.get(room.player1_id)
-    p2 = "AI" 
-
+    map_data = MapLoader.load_map(map_name)
+    map_info = MapData(map_data)
+    
+    width = map_info.width
+    height = map_info.height
+    initial_board = []
+    for _ in range(height): initial_board.append([None] * width)
+    
+    for piece in map_info.get_initial_pieces('R'):
+        x, y = piece['x'], piece['y']
+        if 0 <= y < height and 0 <= x < width:
+            initial_board[y][x] = {'type': piece['type'], 'side': 'R'}
+    
+    for piece in map_info.get_initial_pieces('B'):
+        x, y = piece['x'], piece['y']
+        if 0 <= y < height and 0 <= x < width:
+            initial_board[y][x] = {'type': piece['type'], 'side': 'B'}
+    
+    player_id = current_user.id if current_user.is_authenticated else random.randint(100000, 999999)
+    
     context = {
-        'room': room,
-        'p1_name': p1.username if p1 else '未知',
-        'p2_name': p2,
-        'user': current_user
+        'room': type('obj', (object,), {
+            'id': 0,
+            'player1_id': player_id,
+            'player2_id': -1
+        })(),
+        'p1_name': current_user.username if current_user.is_authenticated else '玩家',
+        'p2_name': 'AI',
+        'user': current_user if current_user.is_authenticated else None,
+        'player_id': player_id,
+        'map_name': map_name,
+        'config': {
+            'RED_PICTURE': Config.RED_PICTURE,
+            'BLACK_PICTURE': Config.BLACK_PICTURE
+        }
     }
 
-    if room.status == 'waiting':
-        return render_template('waiting.html', **context)
-    else:
-        # 游戏进行中或已结束，渲染游戏页
-        return render_template('game.html', **context)
+    template = get_skin_template_path('ai_game.html', request)
+    if template == 'ai_game.html':
+        template = 'ai_game.html'
+    return render_template(template, **context)
 
 # --- API 接口 (用于表单提交，返回JSON让前端跳转) ---
 
@@ -230,7 +260,8 @@ def result_view(room_id):
         user = User.query.get(room.player2_id)
         if user: winner_name = user.username
 
-    return render_template('result.html', 
+    template = get_skin_template_path('result.html', request)
+    return render_template(template, 
                            room_id=room.id, 
                            winner_side=winner_side, 
                            winner_name=winner_name,
@@ -240,13 +271,15 @@ def result_view(room_id):
 @login_required
 def map_editor_view():
     """地图编辑器页面"""
-    return render_template('map_editor.html', user=current_user)
+    template = get_skin_template_path('map_editor.html', request)
+    return render_template(template, user=current_user)
 
 @room_bp.route('/rankings')
 @login_required
 def rankings_view():
     """用户排名页面"""
-    return render_template('rankings.html', user=current_user)
+    template = get_skin_template_path('rankings.html', request)
+    return render_template(template, user=current_user)
 
 @room_bp.route('/api/save-map', methods=['POST'])
 @login_required
@@ -273,35 +306,34 @@ def save_map_api():
 @room_bp.route('/api/create-ai', methods=['POST'])
 @login_required
 def create_ai_room_api():
-    """创建AI游戏房间"""
     # 获取请求数据
     data = request.json
     map_name = data.get('map_name', 'default_map')
     
     # 加载地图数据
-    from map_loader import MapLoader
     map_data = MapLoader.load_map(map_name)
+    map_info = MapData(map_data)
     
     # 初始化棋盘
-    width = map_data['map_info']['width']
-    height = map_data['map_info']['height']
+    width = map_info.width
+    height = map_info.height
     initial_board = []
     for _ in range(height): initial_board.append([None] * width)
     
     # 根据地图数据设置初始棋子
     # 红方 (R)
-    for piece in map_data['initial_pieces']['R']:
+    for piece in map_info.get_initial_pieces('R'):
         x, y = piece['x'], piece['y']
         if 0 <= y < height and 0 <= x < width:
             initial_board[y][x] = {'type': piece['type'], 'side': 'R'}
     
     # 黑方 (B)
-    for piece in map_data['initial_pieces']['B']:
+    for piece in map_info.get_initial_pieces('B'):
         x, y = piece['x'], piece['y']
         if 0 <= y < height and 0 <= x < width:
             initial_board[y][x] = {'type': piece['type'], 'side': 'B'}
 
-    # 初始化卡牌
+    # 初始化玩家卡牌库存
     initial_cards = {}
     initial_cards[str(current_user.id)] = {k: v['limit'] for k, v in CARD_CONFIG.items()}
 
@@ -309,7 +341,7 @@ def create_ai_room_api():
     game_state = {
         'board': initial_board,
         'turn': current_user.id,
-        'turn_number': 1,              # 初始化回合数为1
+        'turn_number': 1,
         'steps_left': 0,
         'has_rolled': False,
         'winner': None,
@@ -324,12 +356,6 @@ def create_ai_room_api():
     new_room = GameRoom(player1_id=current_user.id, status='waiting')
     new_room.set_state(game_state)
     db.session.add(new_room)
-    
-    # 【新增】增加玩家的棋局数
-    user = User.query.get(current_user.id)
-    if user:
-        user.games_played += 1
-    
     db.session.commit()
 
     return jsonify({'success': True, 'room_id': new_room.id})
@@ -653,7 +679,8 @@ def combat_logs_view(room_id):
         'user': current_user
     }
     
-    return render_template('combat_logs.html', **context)
+    template = get_skin_template_path('combat_logs.html', request)
+    return render_template(template, **context)
 
 @room_bp.route('/api/combat-logs/<int:room_id>')
 @login_required
@@ -695,7 +722,8 @@ def get_combat_logs_api(room_id):
 @login_required
 def my_games_view():
     """用户个人对局记录页面"""
-    return render_template('my_games.html', user=current_user)
+    template = get_skin_template_path('my_games.html', request)
+    return render_template(template, user=current_user)
 
 @room_bp.route('/api/my-games')
 @login_required
@@ -742,5 +770,50 @@ def get_my_games_api():
             })
         
         return jsonify({'success': True, 'games': games_data})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)})
+
+@room_bp.route('/api/ai-init')
+def get_ai_init_state():
+    """获取AI房间初始游戏状态"""
+    try:
+        map_name = request.args.get('map', 'default_map')
+        
+        map_data = MapLoader.load_map(map_name)
+        map_info = MapData(map_data)
+        
+        width = map_info.width
+        height = map_info.height
+        initial_board = []
+        for _ in range(height): initial_board.append([None] * width)
+        
+        for piece in map_info.get_initial_pieces('R'):
+            x, y = piece['x'], piece['y']
+            if 0 <= y < height and 0 <= x < width:
+                initial_board[y][x] = {'type': piece['type'], 'side': 'R'}
+        
+        for piece in map_info.get_initial_pieces('B'):
+            x, y = piece['x'], piece['y']
+            if 0 <= y < height and 0 <= x < width:
+                initial_board[y][x] = {'type': piece['type'], 'side': 'B'}
+        
+        player_id = current_user.id if current_user.is_authenticated else random.randint(100000, 999999)
+        
+        game_state = {
+            'board': initial_board,
+            'turn': player_id,
+            'turn_number': 1,
+            'steps_left': 0,
+            'has_rolled': False,
+            'winner': None,
+            'cards': {str(player_id): {k: v['limit'] for k, v in CARD_CONFIG.items()}},
+            'active_card': None,
+            'active_cards': {},
+            'terrain': map_data['terrain'],
+            'terrain_types': map_data['terrain_types'],
+            'piece_types': map_data['piece_types']
+        }
+        
+        return jsonify({'success': True, 'state': game_state})
     except Exception as e:
         return jsonify({'success': False, 'msg': str(e)})

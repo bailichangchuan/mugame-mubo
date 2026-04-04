@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>博弈象棋 · 决斗版</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        /* ... (保留之前的样式) ... */
+        body { font-family: 'KaiTi', serif; background-color: #f0e6d2; text-align: center; }
+        .container { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
+        
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(9, 60px);
+            grid-template-rows: repeat(9, 60px);
+            background-color: #deb887;
+            border: 5px solid #8b4513;
+        }
+
+        .cell {
+            width: 60px; height: 60px;
+            border: 1px solid #a0522d;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; cursor: pointer;
+            user-select: none;
+        }
+        .river { background-color: #87ceeb; opacity: 0.3; }
+
+        .piece {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            color: white;
+            position: relative;
+        }
+        .side-R { background-color: #e74c3c; border: 2px solid #c0392b; }
+        .side-B { background-color: #34495e; border: 2px solid #2c3e50; }
+        .selected { box-shadow: 0 0 10px 5px yellow; }
+
+        /* 战斗弹窗样式 */
+        #combat-modal {
+            position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9); color: white;
+            padding: 20px; border-radius: 10px; border: 2px solid gold;
+            display: none; z-index: 1000; text-align: center;
+        }
+        .sticks-display { font-family: monospace; font-size: 20px; letter-spacing: 5px; color: yellow; }
+        
+        #info-panel { width: 250px; text-align: left; padding: 15px; background: white; border: 1px solid #ccc; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <div id="combat-modal">
+        <h2 style="color: red;">⚔️ 决斗时刻 ⚔️</h2>
+        <div id="combat-details"></div>
+        <h3 id="combat-result"></h3>
+    </div>
+
+    <!-- 游戏说明弹窗 -->
+    <div id="game-guide-modal" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; color: #333; padding: 30px; border-radius: 10px; border: 3px solid #3498db; display: none; z-index: 2000; width: 80%; max-width: 900px; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #3498db; margin: 0;">🎮 博弈象棋 · 游戏说明</h2>
+            <button onclick="closeGameGuide()" style="padding: 8px 16px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">关闭</button>
+        </div>
+        
+        <!-- 导航标签 -->
+        <div style="display: flex; border-bottom: 2px solid #3498db; margin-bottom: 20px;">
+            <button onclick="showGuideTab('basic')" class="guide-tab" style="padding: 10px 20px; margin-right: 5px; border: none; background: #3498db; color: white; border-radius: 5px 5px 0 0; cursor: pointer;">游戏基本信息</button>
+            <button onclick="showGuideTab('pieces')" class="guide-tab" style="padding: 10px 20px; margin-right: 5px; border: none; background: #95a5a6; color: white; border-radius: 5px 5px 0 0; cursor: pointer;">棋子信息</button>
+            <button onclick="showGuideTab('terrain')" class="guide-tab" style="padding: 10px 20px; margin-right: 5px; border: none; background: #95a5a6; color: white; border-radius: 5px 5px 0 0; cursor: pointer;">地形与高度</button>
+            <button onclick="showGuideTab('combat')" class="guide-tab" style="padding: 10px 20px; border: none; background: #95a5a6; color: white; border-radius: 5px 5px 0 0; cursor: pointer;">战斗系统</button>
+        </div>
+        
+        <!-- 内容区域 -->
+        <div id="guide-content">
+            <!-- 基本信息 -->
+            <div id="basic-tab" class="guide-content-tab">
+                <h3 style="color: #3498db;">游戏基本信息</h3>
+                <p>博弈象棋是一款基于传统象棋规则的创新对战游戏，融合了策略、运气和战术元素。</p>
+                <h4>游戏目标</h4>
+                <p>通过战斗和策略，击败对方的核心棋子（枭）。</p>
+                <h4>游戏流程</h4>
+                <ol>
+                    <li>玩家创建或加入房间</li>
+                    <li>游戏开始，红方先手</li>
+                    <li>每回合玩家先掷采（掷骰子）决定步数</li>
+                    <li>玩家使用步数移动棋子或攻击对方棋子</li>
+                    <li>当一方的枭被击败时，游戏结束</li>
+                </ol>
+                <h4>回合规则</h4>
+                <ul>
+                    <li>每回合玩家有一次掷采机会</li>
+                    <li>掷采结果决定本回合可用步数</li>
+                    <li>移动或攻击会消耗步数</li>
+                    <li>步数用完或玩家主动结束回合，回合结束</li>
+                </ul>
+            </div>
+            
+            <!-- 棋子信息 -->
+            <div id="pieces-tab" class="guide-content-tab" style="display: none;">
+                <h3 style="color: #3498db;">棋子信息</h3>
+                <h4>棋子类型</h4>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <tr style="background: #f2f2f2;">
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">棋子类型</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标识</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">移动范围</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">攻击范围</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">攻击倍率</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">防御倍率</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">特殊能力</th>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">枭</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">X</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.3</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.3</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">核心棋子，被击败则游戏结束</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">散</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">S</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.0</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.0</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">基础棋子</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">炮</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">P</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1-3</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.5</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">0.7</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">远程攻击，可攻击远处目标</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">矢</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">T</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1-3</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.2</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">0.8</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">远程攻击，距离3时有特殊效果</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">工</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">G</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">0.8</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">0.8</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">可修改地形高度</td>
+                    </tr>
+                </table>
+                <h4>棋子属性</h4>
+                <ul>
+                    <li><strong>move_range</strong>：移动范围，决定棋子每回合最多可以移动的格子数</li>
+                    <li><strong>move_cost</strong>：移动成本，每移动一格消耗的步数</li>
+                    <li><strong>combat_range</strong>：攻击范围，决定棋子可以攻击的最大距离</li>
+                    <li><strong>base_power</strong>：攻击倍率，作为攻击方时的基础攻击力</li>
+                    <li><strong>defense_power</strong>：防御倍率，作为防守方时的基础防御力</li>
+                    <li><strong>attack_coop</strong>：攻击连携倍率，当己方棋子为进攻方触发连携攻击时的倍率</li>
+                    <li><strong>defense_coop</strong>：防守连携倍率，当己方棋子为防守方触发连携攻击时的倍率</li>
+                    <li><strong>coop_range</strong>：连携范围，决定连携攻击的有效范围</li>
+                    <li><strong>terrain_change</strong>：地形修改能力，1表示可以修改地形高度</li>
+                </ul>
+            </div>
+            
+            <!-- 地形与高度 -->
+            <div id="terrain-tab" class="guide-content-tab" style="display: none;">
+                <h3 style="color: #3498db;">地形与高度</h3>
+                <h4>地形类型</h4>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <tr style="background: #f2f2f2;">
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">地形类型</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">移动成本</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">战斗加成</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">描述</th>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">平原</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.0</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.0</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">基础地形，无特殊效果</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">河流</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">2.0</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">0.8</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">移动成本增加，战斗效果减弱</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">山地</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.5</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1.2</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">移动成本增加，战斗效果增强</td>
+                    </tr>
+                </table>
+                <h4>高度系统</h4>
+                <p>棋盘上每个格子都有高度值，高度会影响：</p>
+                <ul>
+                    <li><strong>移动</strong>：相邻格子高度差超过1时，无法移动</li>
+                    <li><strong>攻击</strong>：高处攻击低处时，攻击力会有加成</li>
+                    <li><strong>远程攻击</strong>：高度差会影响远程攻击的最大范围</li>
+                </ul>
+                <p>高度值范围：-1（低洼）到 3（高山）</p>
+                <h4>地形修改</h4>
+                <p>工棋子可以修改地形高度，每次修改可以：</p>
+                <ul>
+                    <li>增加1点高度</li>
+                    <li>减少1点高度</li>
+                </ul>
+            </div>
+            
+            <!-- 战斗系统 -->
+            <div id="combat-tab" class="guide-content-tab" style="display: none;">
+                <h3 style="color: #3498db;">战斗系统</h3>
+                <h4>战斗触发</h4>
+                <p>当一方棋子移动到另一方棋子所在的格子时，会触发战斗。</p>
+                <h4>战斗流程</h4>
+                <ol>
+                    <li>双方掷采（生成6位二进制数）</li>
+                    <li>计算双方战力</li>
+                    <li>比较战力，战力高的一方获胜</li>
+                    <li>获胜方留在格子，失败方被移除</li>
+                </ol>
+                <h4>战力计算</h4>
+                <p>战力 = 掷采值 × 倍率</p>
+                <h5>攻击方倍率计算</h5>
+                <ul>
+                    <li>基础倍率：棋子的base_power</li>
+                    <li>连携倍率：根据周围己方棋子的数量和类型计算</li>
+                    <li>距离倍率：远程攻击时，根据距离和高度差计算</li>
+                    <li>地形加成：根据所在地形的战斗加成计算</li>
+                </ul>
+                <h5>防守方倍率计算</h5>
+                <ul>
+                    <li>基础倍率：棋子的defense_power</li>
+                    <li>连携倍率：根据周围己方棋子的数量和类型计算</li>
+                    <li>地形加成：根据所在地形的战斗加成计算</li>
+                </ul>
+                <h4>连携攻击</h4>
+                <p>连携攻击公式：Total = (Σx_i) × [1 + k × (N + T - 2)]</p>
+                <ul>
+                    <li>Σx_i：所有连携棋子的攻击/防御连携倍率之和</li>
+                    <li>k：连携系数，从0.1开始，每10回合增加0.1</li>
+                    <li>N：连携棋子数量</li>
+                    <li>T：连携棋子类型数量</li>
+                </ul>
+                <h4>特殊规则</h4>
+                <ul>
+                    <li><strong>远程攻击</strong>：远程单位攻击近程单位且非临近时，需要满足特殊条件</li>
+                    <li><strong>炮的攻击</strong>：炮可以攻击远处目标，但一回合只能使用一次攻击</li>
+                    <li><strong>矢的远程狙击</strong>：矢在距离3时攻击有特殊效果</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 遮罩层 -->
+    <div id="guide-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 1999;"></div>
+
+    <h1>博弈象棋 · 决斗版</h1>
+    <button onclick="openGameGuide()" style="margin: 10px; padding: 10px 20px; font-size: 16px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">游戏说明</button>
+
+    {% if not current_user.is_authenticated %}
+        <div style="margin-top:100px;">
+            <a href="/game/bo/login"><button>登录游戏</button></a>
+        </div>
+    {% else %}
+        <div id="lobby">
+            <p>玩家: {{ current_user.username }}</p>
+            <button onclick="createGame()">创建房间</button>
+            <input type="text" id="room-input" placeholder="输入房间ID">
+            <button onclick="joinGame()">加入房间</button>
+        </div>
+
+        <div id="game-area" style="display:none;">
+            <div class="container">
+                <div id="game-board"></div>
+                
+                <div id="info-panel">
+                    <h3>房间 ID: <span id="disp-room-id"></span></h3>
+                    <p>状态: <span id="status-msg">等待中...</span></p>
+                    <hr>
+                    <p>当前回合: <strong id="disp-turn" style="font-size: 18px;"></strong></p>
+                    
+                    <div style="background: #eee; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                        <p>本回剩余步数: <span id="disp-steps" style="font-size:30px; color:red; font-weight:bold;">0</span></p>
+                        <button id="btn-roll" onclick="rollForTurn()" style="width:100%; background:gold; color:black;">🎲 掷采 (决定步数)</button>
+                    </div>
+
+                    <button onclick="endTurnManual()">结束回合</button>
+                    
+                    <div id="log-area" style="margin-top:20px; font-size:12px; height:150px; overflow-y:auto; border-top:1px solid #ccc;">
+                        <p style="color:gray;">-- 游戏日志 --</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <script>
+        // 游戏说明弹窗相关函数
+        function openGameGuide() {
+            document.getElementById('game-guide-modal').style.display = 'block';
+            document.getElementById('guide-overlay').style.display = 'block';
+        }
+        
+        function closeGameGuide() {
+            document.getElementById('game-guide-modal').style.display = 'none';
+            document.getElementById('guide-overlay').style.display = 'none';
+        }
+        
+        function showGuideTab(tabId) {
+            // 隐藏所有内容
+            const tabContents = document.querySelectorAll('.guide-content-tab');
+            tabContents.forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // 移除所有标签的活跃状态
+            const guideTabs = document.querySelectorAll('.guide-tab');
+            guideTabs.forEach(tab => {
+                tab.style.background = '#95a5a6';
+            });
+            
+            // 显示选中的内容和标签
+            document.getElementById(tabId + '-tab').style.display = 'block';
+            event.currentTarget.style.background = '#3498db';
+        }
+        
+        // 点击遮罩层关闭弹窗
+        document.getElementById('guide-overlay').onclick = closeGameGuide;
+        
+        const socket = io();
+        let currentRoomId = null;
+        let mySide = null; 
+        let currentTurnPlayerId = null;
+        let myUserId = {{ current_user.id if current_user.is_authenticated else 'null' }};
+        let selectedPiece = null;
+        let globalBoardState = []; // 缓存棋盘数据
+
+        // --- Socket 监听 ---
+
+        socket.on('game_created', (data) => {
+            mySide = 'R'; 
+            initGameUI(data.room_id, data.state, "等待对手...");
+        });
+
+        socket.on('game_started', (data) => {
+            if (myUserId === data.players.R.id) mySide = 'R';
+            else if (myUserId === data.players.B.id) mySide = 'B';
+            else mySide = 'Spectator';
+            
+            initGameUI(data.room_id, data.state, `对手: ${mySide==='R'?data.players.B.name:data.players.R.name}`);
+        });
+
+        socket.on('roll_result', (data) => {
+            addLog(`🎲 掷采: [${data.sticks.join('')}] -> ${data.steps} 步`);
+        });
+
+        socket.on('board_update', (data) => {
+            renderBoard(data.state.board);
+            updateInfo(data.state);
+            
+            // 如果有战斗数据，展示弹窗
+            if (data.combat) {
+                showCombatModal(data.combat);
+            }
+            if (data.turn_ended) {
+                addLog("--- 回合结束 ---");
+            }
+        });
+
+        socket.on('error', (data) => {
+            alert(data.msg);
+        });
+
+        // --- 逻辑函数 ---
+
+        function initGameUI(roomId, state, msg) {
+            currentRoomId = roomId;
+            document.getElementById('lobby').style.display = 'none';
+            document.getElementById('game-area').style.display = 'block';
+            document.getElementById('disp-room-id').innerText = roomId;
+            document.getElementById('status-msg').innerText = msg;
+            renderBoard(state.board);
+            updateInfo(state);
+        }
+
+        function createGame() { socket.emit('create_game'); }
+        function joinGame() { 
+            const id = document.getElementById('room-input').value;
+            if(id) socket.emit('join_game', {room_id: id});
+        }
+        function rollForTurn() {
+            socket.emit('roll_for_turn', {room_id: currentRoomId});
+        }
+        function endTurnManual() {
+            socket.emit('end_turn_manually', {room_id: currentRoomId});
+        }
+
+        function updateInfo(state) {
+            currentTurnPlayerId = state.turn;
+            document.getElementById('disp-steps').innerText = state.steps_left;
+            
+            const isMyTurn = (state.turn === myUserId);
+            document.getElementById('disp-turn').innerText = isMyTurn ? "👉 轮到你了" : "⏳ 对方回合";
+            document.getElementById('disp-turn').style.color = isMyTurn ? "green" : "gray";
+
+            // 控制掷采按钮：只有是我的回合，且还没掷过采(has_rolled=false)时可用
+            const btnRoll = document.getElementById('btn-roll');
+            if (isMyTurn && !state.has_rolled) {
+                btnRoll.disabled = false;
+                btnRoll.innerText = "🎲 掷采 (决定步数)";
+            } else {
+                btnRoll.disabled = true;
+                btnRoll.innerText = state.has_rolled ? "已掷采" : "等待回合";
+            }
+
+            if (state.winner) {
+                setTimeout(() => alert(`游戏结束! ${state.winner === 'R' ? '红方' : '黑方'} 获胜!`), 500);
+            }
+        }
+
+        function showCombatModal(combat) {
+            const modal = document.getElementById('combat-modal');
+            const details = document.getElementById('combat-details');
+            const result = document.getElementById('combat-result');
+            
+            // 格式化二进制
+            const atkBin = combat.attacker.sticks.join('');
+            const defBin = combat.defender.sticks.join('');
+            
+            details.innerHTML = `
+                <p>进攻方 (${combat.attacker.side})</p>
+                <div class="sticks-display">${atkBin}</div>
+                <p>战力: <strong>${combat.attacker.power}</strong></p>
+                <hr style="border-color: #555;">
+                <p>防守方 (${combat.defender.side})</p>
+                <div class="sticks-display">${defBin}</div>
+                <p>战力: <strong>${combat.defender.power}</strong></p>
+            `;
+            
+            if (combat.winner === 'attacker') {
+                result.innerText = "💥 进攻成功！防守方被吃！";
+                result.style.color = "#0f0";
+            } else {
+                result.innerText = "🛡️ 进攻失败！遭到反杀！";
+                result.style.color = "orange";
+            }
+            
+            modal.style.display = 'block';
+            addLog(combat.msg);
+
+            // 3秒后自动关闭
+            setTimeout(() => { modal.style.display = 'none'; }, 3000);
+        }
+
+        function addLog(msg) {
+            const logArea = document.getElementById('log-area');
+            const p = document.createElement('p');
+            p.innerText = msg;
+            p.style.margin = "2px 0";
+            logArea.prepend(p);
+        }
+
+        function renderBoard(boardData) {
+            globalBoardState = boardData; // 更新缓存
+            const boardContainer = document.getElementById('game-board');
+            boardContainer.innerHTML = ''; 
+
+            if (!boardData) return;
+
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    if (r === 4) cell.classList.add('river');
+
+                    const piece = boardData[r][c];
+                    if (piece) {
+                        const pDiv = document.createElement('div');
+                        pDiv.className = `piece side-${piece.side}`;
+                        pDiv.innerText = piece.type === 'X' ? '枭' : '散';
+                        if (selectedPiece && selectedPiece.r === r && selectedPiece.c === c) {
+                            pDiv.classList.add('selected');
+                        }
+                        cell.appendChild(pDiv);
+                    }
+                    cell.onclick = () => handleCellClick(r, c, piece);
+                    boardContainer.appendChild(cell);
+                }
+            }
+        }
+
+        function handleCellClick(r, c, piece) {
+            if (currentTurnPlayerId !== myUserId) return;
+
+            // 移动逻辑
+            if (!selectedPiece) {
+                if (piece && piece.side === mySide) {
+                    selectedPiece = {r, c};
+                    renderBoard(globalBoardState);
+                }
+            } else {
+                // 取消选中
+                if (selectedPiece.r === r && selectedPiece.c === c) {
+                    selectedPiece = null;
+                    renderBoard(globalBoardState);
+                    return;
+                }
+                // 切换选中
+                if (piece && piece.side === mySide) {
+                    selectedPiece = {r, c};
+                    renderBoard(globalBoardState);
+                    return;
+                }
+                // 移动或攻击
+                socket.emit('move_piece', {
+                    room_id: currentRoomId,
+                    from_r: selectedPiece.r,
+                    from_c: selectedPiece.c,
+                    to_r: r,
+                    to_c: c
+                });
+                selectedPiece = null;
+            }
+        }
+    </script>
+</body>
+</html>

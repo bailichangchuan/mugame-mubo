@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}六博棋{% endblock %}</title>
+    <style>
+        body { margin: 0; font-family: sans-serif; }
+        
+        /* 顶部导航栏样式 */
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        .navbar a:hover {
+            color: #ddd;
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .username {
+            color: #ffd700;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        .footer {
+            color : #333;
+        }
+        body { font-family: 'KaiTi', serif; background-color: #f0e6d2; text-align: center; color: #333; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; border: 1px solid #8b4513; background: #fff; }
+        button:hover { background: #eee; }
+        input { padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; }
+        .container { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
+        
+        /* 按钮样式 */
+        .rules-trigger-btn {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        .rules-trigger-btn:hover { background-color: #2980b9; }
+        
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed; 
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 0;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            animation: slideDown 0.4s;
+        }
+        
+        @keyframes slideDown {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+        
+        .modal-header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body { padding: 20px; line-height: 1.6; color: #333; }
+        .modal-footer { padding: 15px; text-align: right; border-top: 1px solid #eee; }
+        
+        .close-btn { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-btn:hover { color: white; }
+        
+        .confirm-btn {
+            padding: 8px 16px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .confirm-btn:hover { background-color: #219150; }
+        
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="brand">
+            <a href="/game/bo" style="font-size: 20px; font-weight: bold; margin-left: 0;">🏰 六博对战平台</a>
+        </div>
+
+        <div class="user-controls">
+            {% if current_user.is_authenticated %}
+                <span class="username">👤 {{ current_user.username }}</span> 
+                <a href="{{ url_for('auth.logout') }}" style="background:#c0392b; padding:5px 10px; border-radius:4px;">退出</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}">登录</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div style="background:#f1c40f; padding:10px; text-align:center;">
+                {% for message in messages %}
+                    <div>{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io({
+            path: '/socket.io'
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

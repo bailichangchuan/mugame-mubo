@@ -85,13 +85,6 @@ class MeleePieceBehavior(PieceBehavior):
     """
     
     def can_move(self, from_pos: Tuple[int, int], to_pos: Tuple[int, int], game_state: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
-        # 计算曼哈顿距离
-        distance = abs(from_pos[0] - to_pos[0]) + abs(from_pos[1] - to_pos[1])
-        
-        # 近战棋子只能移动1格
-        if distance != 1:
-            return False, "近战棋子只能移动一格"
-        
         # 检查地形是否可通行
         terrain = game_state.get('terrain', {})
         terrain_types = game_state.get('terrain_types', {})
@@ -162,13 +155,6 @@ class RangedPieceBehavior(PieceBehavior):
     """
     
     def can_move(self, from_pos: Tuple[int, int], to_pos: Tuple[int, int], game_state: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
-        # 计算曼哈顿距离
-        distance = abs(from_pos[0] - to_pos[0]) + abs(from_pos[1] - to_pos[1])
-        
-        # 远程棋子只能移动1格
-        if distance != 1:
-            return False, "远程棋子只能移动一格"
-        
         # 检查地形是否可通行
         terrain = game_state.get('terrain', {})
         terrain_types = game_state.get('terrain_types', {})
@@ -307,13 +293,6 @@ class CannonPieceBehavior(RangedPieceBehavior):
     """
     
     def can_move(self, from_pos: Tuple[int, int], to_pos: Tuple[int, int], game_state: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
-        # 计算曼哈顿距离
-        distance = abs(from_pos[0] - to_pos[0]) + abs(from_pos[1] - to_pos[1])
-        
-        # 炮只能移动1格
-        if distance != 1:
-            return False, "炮只能移动一格"
-        
         # 检查地形是否可通行
         terrain = game_state.get('terrain', {})
         terrain_types = game_state.get('terrain_types', {})
