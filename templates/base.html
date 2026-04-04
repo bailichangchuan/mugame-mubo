@@ -8,6 +8,10 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="mobile-web-app-capable" content="yes">
     <title>{% block title %}六博棋{% endblock %}</title>
+    {% set current_skin = request.cookies.get('skin', 'default') %}
+    {% if current_skin == 'mubo' %}
+    <link rel="stylesheet" href="/skins/mubo/mubo_base.css">
+    {% else %}
     <style>
         :root {
             --ink-bg: #f5f0e6;
@@ -221,6 +225,7 @@
         .confirm-btn:hover { background: var(--ink-dark); }
         /* 其他通用 CSS */
     </style>
+    {% endif %}
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -236,7 +241,18 @@
         {% else %}
             <a href="{{ url_for('auth.login') }}">登录</a>
         {% endif %}
+        <select id="skin-selector" onchange="switchSkin(this.value)" style="padding: 5px 10px; border-radius: 4px; border: 1px solid var(--ink-brown); background: var(--cream); color: var(--ink-dark); font-family: inherit; font-size: 14px;">
+            <option value="default" {% if current_skin != 'mubo' %}selected{% endif %}>默认皮肤</option>
+            <option value="mubo" {% if current_skin == 'mubo' %}selected{% endif %}>Mubo原版</option>
+        </select>
     </div>
+    
+    <script>
+        function switchSkin(skinName) {
+            document.cookie = "skin=" + skinName + "; path=/; max-age=" + (365 * 24 * 60 * 60);
+            location.reload();
+        }
+    </script>
 
     {% with messages = get_flashed_messages() %}
         {% if messages %}

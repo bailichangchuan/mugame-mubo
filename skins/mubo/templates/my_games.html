@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}我的对局记录 - 博棋{% endblock %}
+
+{% block extra_css %}
+<style>
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .games-list {
+        margin-top: 20px;
+    }
+    .game-item {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .game-info {
+        flex: 1;
+    }
+    .game-info h3 {
+        margin: 0 0 10px 0;
+        color: #333;
+    }
+    .game-info p {
+        margin: 5px 0;
+        color: #666;
+    }
+    .game-actions {
+        display: flex;
+        gap: 10px;
+    }
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+    }
+    .result-win {
+        color: #28a745;
+        font-weight: bold;
+    }
+    .result-loss {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .result-draw {
+        color: #6c757d;
+        font-weight: bold;
+    }
+    .result-playing {
+        color: #007bff;
+        font-weight: bold;
+    }
+    .loading {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+    .empty-state h3 {
+        margin-bottom: 10px;
+        color: #333;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>我的对局记录</h1>
+    <p>玩家: {{ user.username }}</p>
+    
+    <div id="games-container" class="games-list">
+        <div class="loading">加载中...</div>
+    </div>
+    
+    <div style="margin-top: 30px;">
+        <a href="{{ url_for('room.index') }}" class="btn btn-secondary">返回首页</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function loadMyGames() {
+        fetch('/game/bo/api/my-games')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('games-container');
+                
+                if (!data.success) {
+                    container.innerHTML = '<div class="empty-state"><h3>加载失败</h3><p>' + data.msg + '</p></div>';
+                    return;
+                }
+                
+                if (data.games.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><h3>暂无对局记录</h3><p>您还没有参与任何对局，快去创建或加入房间吧！</p></div>';
+                    return;
+                }
+                
+                container.innerHTML = '';
+                data.games.forEach(game => {
+                    const gameDiv = document.createElement('div');
+                    gameDiv.className = 'game-item';
+                    
+                    // 根据结果设置样式
+                    let resultClass = '';
+                    let resultText = game.result;
+                    if (game.result === '胜利') {
+                        resultClass = 'result-win';
+                    } else if (game.result === '失败') {
+                        resultClass = 'result-loss';
+                    } else if (game.result === '平局') {
+                        resultClass = 'result-draw';
+                    } else {
+                        resultClass = 'result-playing';
+                    }
+                    
+                    // 构建操作按钮
+                    let actionButtons = '';
+                    if (game.status === 'playing') {
+                        actionButtons = `<a href="/game/bo/room/${game.room_id}" class="btn btn-success">继续游戏</a>`;
+                    } else if (game.status === 'finished') {
+                        actionButtons = `<a href="/game/bo/combat-logs/${game.room_id}" class="btn btn-primary">查看战斗记录</a>`;
+                    }
+                    
+                    gameDiv.innerHTML = `
+                        <div class="game-info">
+                            <h3>房间 #${game.room_id}</h3>
+                            <p>阵营: ${game.my_side} | 对手: ${game.opponent}</p>
+                            <p>状态: <span class="${resultClass}">${resultText}</span></p>
+                        </div>
+                        <div class="game-actions">
+                            ${actionButtons}
+                        </div>
+                    `;
+                    
+                    container.appendChild(gameDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('games-container').innerHTML = 
+                    '<div class="empty-state"><h3>加载失败</h3><p>请刷新页面重试</p></div>';
+            });
+    }
+    
+    // 页面加载时获取数据
+    loadMyGames();
+</script>
+{% endblock %}

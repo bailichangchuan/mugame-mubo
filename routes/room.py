@@ -2,29 +2,36 @@ from flask import Blueprint, render_template, redirect, url_for, jsonify, reques
 from flask_login import login_required, current_user
 from flask_socketio import emit, join_room
 from extensions import db, socketio
-from config import Config  # 修改这一行
+from config import Config
 from models import GameRoom, User, CombatLog
 from map_loader import MapLoader, MapData
+import os
 import random
 
-# 然后在使用的地方修改为
-CARD_CONFIG = Config.CARD_CONFIG  # 添加这一行
+CARD_CONFIG = Config.CARD_CONFIG
 
 room_bp = Blueprint('room', __name__, url_prefix='/game/bo')
+
+def get_skin_template_path(template_name, request):
+    """根据用户皮肤选择返回模板路径"""
+    skin = request.cookies.get('skin', 'default')
+    if skin == 'mubo':
+        return f'mubo/{template_name}'
+    return template_name
 
 # --- 页面路由 (HTTP View) ---
 
 @room_bp.route('/')
 def index():
     """首页：显示创建和加入表单"""
-    # if not current_user.is_authenticated:
-    #     return redirect('/game/bo/login')
-    return render_template('home.html', user=current_user)
+    template = get_skin_template_path('home.html', request)
+    return render_template(template, user=current_user)
 
 @room_bp.route('/guide')
 def game_guide():
     """游戏说明页面"""
-    return render_template('game_guide.html')
+    template = get_skin_template_path('game_guide.html', request)
+    return render_template(template)
 
 @room_bp.route('/room/<int:room_id>')
 @login_required
@@ -32,7 +39,6 @@ def room_view(room_id):
     """房间页：根据状态分发到 等待页 或 游戏页"""
     room = GameRoom.query.get_or_404(room_id)
     
-    # 获取双方名字用于显示
     p1 = User.query.get(room.player1_id)
     p2 = User.query.get(room.player2_id) if room.player2_id else None
 
@@ -44,10 +50,10 @@ def room_view(room_id):
     }
 
     if room.status == 'waiting':
-        return render_template('waiting.html', **context)
+        template = get_skin_template_path('waiting.html', request)
+        return render_template(template, **context)
     else:
-        # 游戏进行中或已结束，渲染游戏页
-        return render_template('game.html', **context)
+        return render_template('mubo/game.html', **context)
 
 @room_bp.route('/ai-room')
 def ai_room_view():
@@ -91,7 +97,10 @@ def ai_room_view():
         }
     }
 
-    return render_template('ai_game.html', **context)
+    template = get_skin_template_path('ai_game.html', request)
+    if template == 'ai_game.html':
+        template = 'ai_game.html'
+    return render_template(template, **context)
 
 # --- API 接口 (用于表单提交，返回JSON让前端跳转) ---
 
@@ -251,7 +260,8 @@ def result_view(room_id):
         user = User.query.get(room.player2_id)
         if user: winner_name = user.username
 
-    return render_template('result.html', 
+    template = get_skin_template_path('result.html', request)
+    return render_template(template, 
                            room_id=room.id, 
                            winner_side=winner_side, 
                            winner_name=winner_name,
@@ -261,13 +271,15 @@ def result_view(room_id):
 @login_required
 def map_editor_view():
     """地图编辑器页面"""
-    return render_template('map_editor.html', user=current_user)
+    template = get_skin_template_path('map_editor.html', request)
+    return render_template(template, user=current_user)
 
 @room_bp.route('/rankings')
 @login_required
 def rankings_view():
     """用户排名页面"""
-    return render_template('rankings.html', user=current_user)
+    template = get_skin_template_path('rankings.html', request)
+    return render_template(template, user=current_user)
 
 @room_bp.route('/api/save-map', methods=['POST'])
 @login_required
@@ -667,7 +679,8 @@ def combat_logs_view(room_id):
         'user': current_user
     }
     
-    return render_template('combat_logs.html', **context)
+    template = get_skin_template_path('combat_logs.html', request)
+    return render_template(template, **context)
 
 @room_bp.route('/api/combat-logs/<int:room_id>')
 @login_required
@@ -709,7 +722,8 @@ def get_combat_logs_api(room_id):
 @login_required
 def my_games_view():
     """用户个人对局记录页面"""
-    return render_template('my_games.html', user=current_user)
+    template = get_skin_template_path('my_games.html', request)
+    return render_template(template, user=current_user)
 
 @room_bp.route('/api/my-games')
 @login_required

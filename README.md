@@ -149,3 +149,97 @@ python3 app.py
 - 保护枭：枭会保持在安全位置
 - 地形利用：占领高处获得战斗优势
 - 路线规划：多路协同进攻
+
+---
+
+## 🎨 皮肤系统 (分支: ai对战版本)
+
+本项目支持多皮肤切换功能，可以完全替换UI界面。
+
+### 皮肤目录结构
+```
+skins/
+└── mubo/                    # Mubo原版皮肤
+    ├── mubo_base.css        # 皮肤样式覆盖
+    └── templates/            # 皮肤HTML模板
+        ├── base.html         # 基础模板
+        ├── home.html         # 首页
+        ├── game.html         # 游戏页面
+        ├── waiting.html      # 等待房间
+        ├── result.html       # 结果页面
+        ├── game_guide.html   # 游戏说明
+        ├── rankings.html     # 排行榜
+        ├── combat_logs.html  # 战斗记录
+        ├── map_editor.html   # 地图编辑器
+        ├── my_games.html     # 我的对局
+        ├── ai_game.html      # AI对战页面
+        └── index.html        # 备用首页
+```
+
+### 皮肤切换机制
+
+#### 工作原理
+1. **Cookie 存储**：用户皮肤偏好保存在 Cookie 中（有效期1年）
+2. **模板覆盖**：启用皮肤时，自动使用 `skins/mubo/templates/` 下的模板文件
+3. **样式覆盖**：启用皮肤时，加载 `skins/mubo/mubo_base.css` 覆盖默认样式
+
+#### 核心文件
+
+| 文件 | 作用 |
+|------|------|
+| `app.py` | 配置 Jinja2 模板加载器，支持皮肤模板路径解析 |
+| `routes/room.py` | `get_skin_template_path()` 函数根据 Cookie 返回对应模板路径 |
+| `templates/base.html` | 添加皮肤选择器 UI 和切换逻辑 |
+
+#### 切换逻辑
+```python
+# routes/room.py
+def get_skin_template_path(template_name, request):
+    skin = request.cookies.get('skin', 'default')
+    if skin == 'mubo':
+        return f'mubo/{template_name}'  # 使用皮肤模板
+    return template_name  # 使用默认模板
+```
+
+### 创建新皮肤
+
+1. **创建皮肤目录**：
+```bash
+mkdir -p skins/your_skin_name/templates
+mkdir -p skins/your_skin_name/static
+```
+
+2. **添加模板文件**：
+在 `skins/your_skin_name/templates/` 下添加 HTML 模板文件
+
+3. **添加样式文件**：
+在 `skins/your_skin_name/` 下添加 CSS 文件
+
+4. **修改皮肤检测逻辑**：
+在 `routes/room.py` 的 `get_skin_template_path()` 函数中添加新皮肤的判断
+
+### 默认皮肤 vs Mubo原版皮肤
+
+| 特性 | 默认皮肤 | Mubo原版皮肤 |
+|------|----------|--------------|
+| 风格 | 水墨丹青 | 原版UI |
+| 导航栏 | 包含皮肤切换器 | 标准导航 |
+| 配色 | 竹绿/棕色 | 原版配色 |
+| 模板来源 | `templates/` | `skins/mubo/templates/` |
+
+### 静态文件访问
+
+皮肤相关的静态文件通过以下路由访问：
+```
+/skins/<path:filename>
+```
+
+例如：`/skins/mubo/mubo_base.css`
+
+该路由在 `app.py` 的 `create_app()` 函数中定义。
+
+### 注意事项
+
+- 皮肤模板中使用 `{% extends "base.html" %}` 继承基础结构
+- 皮肤 base.html 必须定义 `{% block content %}{% endblock %}` 和 `{% block extra_js %}{% endblock %}`
+- Socket.IO 连接路径需与后端配置一致（本地：`/socket.io`，部署：`/game/bo/socket.io`）

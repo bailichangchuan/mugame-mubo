@@ -11,7 +11,7 @@ class Config:
     SSO_VERIFY_URL = "https://muvocal.com/auth/verify_token"
     SSO_CLIENT_ID = "bo_app"
     SSO_CLIENT_SECRET = "bo_secret"
-    SSO_REDIRECT_URI = "https://muvocal.com/game/bo/sso_callback"
+    SSO_REDIRECT_URI = "http://192.168.68.64:5212/game/bo/sso_callback"
 
     # game.py 顶部添加配置
     CARD_CONFIG = {

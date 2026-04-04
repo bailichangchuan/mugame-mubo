@@ -2,16 +2,130 @@
 
 {% block title %}等待中 - 房间 {{ room.id }}{% endblock %}
 
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'KaiTi', 'STKaiti', serif;
+        background-color: var(--cream) !important;
+        background-image: url('/static/bg_original.png') !important;
+        background-size: cover !important;
+        background-position: center !important;
+    }
+    
+    .waiting-container {
+        background: rgba(250, 246, 239, 0.95);
+        padding: 50px;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(74, 63, 53, 0.3);
+        text-align: center;
+        max-width: 600px;
+        margin: 120px auto 0;
+        border: 4px solid var(--ink-brown);
+        position: relative;
+    }
+    
+    .waiting-container::before {
+        content: '';
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        border: 2px solid var(--ink-brown);
+        border-radius: 10px;
+        pointer-events: none;
+        opacity: 0.5;
+    }
+    
+    .room-info {
+        margin-bottom: 30px;
+    }
+    
+    .room-id {
+        font-size: 2.5em;
+        color: var(--ink-red);
+        font-weight: bold;
+        letter-spacing: 3px;
+        margin: 20px 0;
+    }
+    
+    .player-info {
+        font-size: 1.3em;
+        color: var(--ink-dark);
+        margin: 15px 0;
+        letter-spacing: 2px;
+    }
+    
+    .divider {
+        border: none;
+        border-top: 3px double var(--ink-brown);
+        width: 60%;
+        margin: 30px auto;
+    }
+    
+    #wait-area {
+        padding: 30px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 12px;
+        border: 2px solid var(--ink-brown);
+    }
+    
+    .wait-title {
+        font-size: 1.8em;
+        color: var(--ink-brown);
+        margin-bottom: 20px;
+        letter-spacing: 3px;
+    }
+    
+    .wait-message {
+        font-size: 1.2em;
+        color: var(--ink-dark);
+        margin-bottom: 25px;
+    }
+    
+    .loader {
+        border: 5px solid var(--paper);
+        border-top: 5px solid var(--ink-red);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 768px) {
+        .waiting-container {
+            margin: 80px 20px 0;
+            padding: 30px;
+        }
+        
+        .room-id {
+            font-size: 2em;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="margin-top: 100px;">
-    <h2>房间号: <span style="color: red; font-size: 32px;">{{ room.id }}</span></h2>
-    <p>房主 (红方): {{ p1_name }}</p>
-    <hr style="width: 50%;">
+<div class="waiting-container">
+    <div class="room-info">
+        <h1 style="color: var(--ink-brown); letter-spacing: 5px;">🎮 游戏房间</h1>
+        <div class="room-id">房间号: {{ room.id }}</div>
+        <p class="player-info">房主 (红方): <strong>{{ p1_name }}</strong></p>
+    </div>
+    
+    <hr class="divider">
     
     <div id="wait-area">
-        <h3>⏳ 等待对手加入...</h3>
-        <p>请将房间号告诉你的朋友</p>
-        <div class="loader"></div> </div>
+        <div class="wait-title">⏳ 等待对手加入...</div>
+        <p class="wait-message">请将房间号告诉你的朋友</p>
+        <div class="loader"></div>
+    </div>
 </div>
 {% endblock %}
 
