@@ -27,3 +27,219 @@ nohup python3 -m gunicorn --worker-class eventlet -w 1 -b 127.0.0.1:5211 app:app
 **本项目使用登录功能为muvocal auth sso单点登录，可以联系管理员，或者修改使用自主登录功能，如不使用sso，请修改数据库用户表，该表内无密码字段**
 
 游戏规则见： [[https://muvocal.com/game/bo/guide]]
+
+---
+
+## 🤖 AI对战版本 (分支: ai对战版本)
+
+本分支实现了前端AI对战功能，可以在单人模式下与AI进行对战。
+
+### 新增功能
+
+#### 1. AI对战房间
+- 访问 `/ai-room?map={map_name}` 即可创建AI对战房间
+- 从首页点击「与 AI 对弈」按钮进入
+- AI自动控制黑方（方），玩家控制红方（黑方）
+- AI具有智能决策能力，会主动进攻和防守
+
+#### 2. 水墨风格界面
+- 全新水墨丹青风格UI设计
+- 竹绿色用于移动指示器
+- 统一的棕色/红色水墨配色
+
+#### 3. 战斗系统增强
+- 每场战斗消耗1步
+- 战斗后显示详细战报
+- 招募系统：战斗失败方有机会获得新棋子
+
+#### 4. 音效系统
+- BGM背景音乐（可开关）
+- 棋子移动音效
+- 战斗音效
+- 回合结束提示音
+
+#### 5. 地形系统
+- 平原：基础移动和战斗
+- 水域：移动成本x2，战斗加成0.8
+- 山地：移动成本x2，战斗加成1.2
+- 城墙：禁止通行
+
+#### 6. 游戏存档系统
+- 使用 localStorage 自动保存游戏进度
+- 刷新页面后自动恢复游戏状态
+- 存档有效期 7 天
+- 游戏结束后自动清除存档
+- 支持跳过回合功能
+
+#### 7. 全自动游戏流程
+- 玩家回合自动掷采
+- AI回合自动决策
+- 无需手动操作，全程自动进行
+
+#### 8. 响应式布局
+- 侧栏高度固定，不受控制台影响
+- 固定定位确保侧栏始终可见
+
+#### 9. 存档恢复功能
+- 刷新页面后检测存档，显示恢复弹窗
+- 可选择继续游戏或重新开始
+
+#### 10. 战斗结果显示优化
+- 玩家胜利显示 "🎉 战斗胜利 🎉"
+- 玩家失败显示 "💔 战斗失利 💔"
+- 平局显示 "🤝 势均力敌 🤝"
+
+#### 11. 战斗后回合处理优化
+- 玩家进攻成功且有剩余步数：继续玩家回合
+- 玩家防守成功且有剩余步数：继续玩家回合
+- 玩家进攻/防守成功但无剩余步数：结束回合
+- 平局时步数耗尽：结束回合
+- AI进攻成功且有剩余步数：继续AI移动
+- AI进攻失败且有剩余步数：继续AI移动（修正于2026-04-01）
+- AI进攻成功但无剩余步数：结束AI回合
+- AI进攻失败但无剩余步数：结束AI回合
+
+#### 12. 移动端适配
+- 响应式布局，支持手机和平板设备
+- 触摸优化，最小触摸区域48px
+- 棋盘自动缩放适应屏幕
+- 侧栏从底部滑出式设计（占用75%屏幕高度，宽度自适应）
+- 移动端专用控制按钮（棋盘下方）
+  - 跳过回合按钮（掷采已自动进行）
+- 选中棋子高亮效果优化（防止触摸时丢失）
+- 触摸事件优化，防止误触和卡顿
+- 支持iOS Safari全屏模式
+
+#### 13. "运道不济"动画播报重写
+- 水墨晕染动画效果（墨滴从四周晕染扩散）
+- 棋子叹气动画（棋子上下飘动）
+- 内容逐个淡入动画（标题→描述→诗句→按钮依次出现）
+- 保持用户点击确认消失的交互
+- 水墨风格与游戏整体风格统一
+
+### 文件结构
+```
+static/
+├── js/
+│   ├── ai_player.js              # AI决策核心算法
+│   └── ai_room/
+│       ├── ai_game_main.js       # 主游戏逻辑
+│       ├── ai_game_board.js      # 棋盘渲染
+│       ├── ai_game_combat.js     # 战斗系统
+│       ├── ai_game_sound.js      # 音效管理
+│       └── ai_game_utils.js      # 工具函数
+└── css/
+    └── ai_room/
+        └── ai_game.css           # AI对战样式
+
+templates/
+├── ai_game.html                  # AI对战主页面
+└── ai_room/
+    └── ai_game_components.html   # 游戏组件模板
+```
+
+### 本地开发
+```bash
+python3 app.py
+# 访问 http://localhost:5211/ai_game/default_map
+```
+
+### AI策略
+- 积极进攻：优先攻击敌方棋子
+- 保护枭：枭会保持在安全位置
+- 地形利用：占领高处获得战斗优势
+- 路线规划：多路协同进攻
+
+---
+
+## 🎨 皮肤系统 (分支: ai对战版本)
+
+本项目支持多皮肤切换功能，可以完全替换UI界面。
+
+### 皮肤目录结构
+```
+skins/
+└── mubo/                    # Mubo原版皮肤
+    ├── mubo_base.css        # 皮肤样式覆盖
+    └── templates/            # 皮肤HTML模板
+        ├── base.html         # 基础模板
+        ├── home.html         # 首页
+        ├── game.html         # 游戏页面
+        ├── waiting.html      # 等待房间
+        ├── result.html       # 结果页面
+        ├── game_guide.html   # 游戏说明
+        ├── rankings.html     # 排行榜
+        ├── combat_logs.html  # 战斗记录
+        ├── map_editor.html   # 地图编辑器
+        ├── my_games.html     # 我的对局
+        ├── ai_game.html      # AI对战页面
+        └── index.html        # 备用首页
+```
+
+### 皮肤切换机制
+
+#### 工作原理
+1. **Cookie 存储**：用户皮肤偏好保存在 Cookie 中（有效期1年）
+2. **模板覆盖**：启用皮肤时，自动使用 `skins/mubo/templates/` 下的模板文件
+3. **样式覆盖**：启用皮肤时，加载 `skins/mubo/mubo_base.css` 覆盖默认样式
+
+#### 核心文件
+
+| 文件 | 作用 |
+|------|------|
+| `app.py` | 配置 Jinja2 模板加载器，支持皮肤模板路径解析 |
+| `routes/room.py` | `get_skin_template_path()` 函数根据 Cookie 返回对应模板路径 |
+| `templates/base.html` | 添加皮肤选择器 UI 和切换逻辑 |
+
+#### 切换逻辑
+```python
+# routes/room.py
+def get_skin_template_path(template_name, request):
+    skin = request.cookies.get('skin', 'default')
+    if skin == 'mubo':
+        return f'mubo/{template_name}'  # 使用皮肤模板
+    return template_name  # 使用默认模板
+```
+
+### 创建新皮肤
+
+1. **创建皮肤目录**：
+```bash
+mkdir -p skins/your_skin_name/templates
+mkdir -p skins/your_skin_name/static
+```
+
+2. **添加模板文件**：
+在 `skins/your_skin_name/templates/` 下添加 HTML 模板文件
+
+3. **添加样式文件**：
+在 `skins/your_skin_name/` 下添加 CSS 文件
+
+4. **修改皮肤检测逻辑**：
+在 `routes/room.py` 的 `get_skin_template_path()` 函数中添加新皮肤的判断
+
+### 默认皮肤 vs Mubo原版皮肤
+
+| 特性 | 默认皮肤 | Mubo原版皮肤 |
+|------|----------|--------------|
+| 风格 | 水墨丹青 | 原版UI |
+| 导航栏 | 包含皮肤切换器 | 标准导航 |
+| 配色 | 竹绿/棕色 | 原版配色 |
+| 模板来源 | `templates/` | `skins/mubo/templates/` |
+
+### 静态文件访问
+
+皮肤相关的静态文件通过以下路由访问：
+```
+/skins/<path:filename>
+```
+
+例如：`/skins/mubo/mubo_base.css`
+
+该路由在 `app.py` 的 `create_app()` 函数中定义。
+
+### 注意事项
+
+- 皮肤模板中使用 `{% extends "base.html" %}` 继承基础结构
+- 皮肤 base.html 必须定义 `{% block content %}{% endblock %}` 和 `{% block extra_js %}{% endblock %}`
+- Socket.IO 连接路径需与后端配置一致（本地：`/socket.io`，部署：`/game/bo/socket.io`）

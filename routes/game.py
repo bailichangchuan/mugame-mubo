@@ -5,6 +5,8 @@ from flask_socketio import emit
 from extensions import db, socketio
 from config import CARD_CONFIG
 from models import GameRoom, User, CombatLog
+from game_logic.piece_manager import PieceManager
+from map_loader import MapLoader
 
 # --- 辅助函数: 掷采算法 ---
 def generate_sticks():
@@ -148,25 +150,27 @@ def handle_move(data):
     
     # 检查是否是移动操作（目标为空）
     if target is None:
-        # 移动操作：只限制必须直线移动，不限制距离
-        if fr == tr or fc == tc:
-            # 检查路径上是否有阻挡
-            if not is_path_blocked(board, fr, fc, tr, tc):
-                valid_move = True
-            else:
-                emit('error', {'msg': '路径上有阻挡，无法移动'})
-                return
-        else:
+        # 检查是否是直线移动（对于远程棋子）
+        if fr != tr and fc != tc:
             emit('error', {'msg': '移动只能直线进行'})
             return
+        
+        # 检查路径上是否有阻挡
+        if is_path_blocked(board, fr, fc, tr, tc):
+            emit('error', {'msg': '路径上有阻挡，无法移动'})
+            return
+        
+        valid_move = True
     else:
         # 攻击操作
         if attack_type == 'melee':
             if dist == 1:
                 valid_move = True
         elif attack_type == 'ranged':
-            # 计算基础攻击距离
+            # 从数据库读取攻击范围
             base_range = 3
+            if 'piece_types' in state and attacker_type in state['piece_types']:
+                base_range = state['piece_types'][attacker_type].get('combat_range', 3)
             # 计算最大攻击距离
             max_range = base_range + height_diff
             max_range = max(1, max_range)  # 确保至少可以攻击1格
@@ -214,14 +218,19 @@ def handle_move(data):
                 
                 # 检查攻击距离和路径
                 dist = move_dist
+                # 从数据库读取攻击范围
+                base_range = 3
+                if 'piece_types' in state and attacker['type'] in state['piece_types']:
+                    base_range = state['piece_types'][attacker['type']].get('combat_range', 3)
                 # 计算最大攻击距离
-                max_range = 3
                 if 'terrain' in state and 'height' in state['terrain']:
                     current_height = state['terrain']['height'][fr][fc]
                     target_height = state['terrain']['height'][tr][tc]
                     height_diff = current_height - target_height
-                    max_range = 3 + height_diff
+                    max_range = base_range + height_diff
                     max_range = max(1, max_range)
+                else:
+                    max_range = base_range
                 
                 # 检查攻击距离是否在范围内
                 if 1 <= dist <= max_range:
@@ -335,16 +344,16 @@ def handle_move(data):
                             total_cost += cell_cost
                     
                     # 检查是否有足够的步数
-                    if state['steps_left'] < total_cost:
-                        emit('error', {'msg': f'步数不足，移动需要 {total_cost} 步'})
+                    if state['steps_left'] < 1:
+                        emit('error', {'msg': '步数不足'})
                         return
                     
                     # 执行移动
                     board[tr][tc] = attacker
                     board[fr][fc] = None
                     
-                    # 扣除步数并检查回合结束
-                    state['steps_left'] -= total_cost
+                    # 扣除步数并检查回合结束（每次移动只消耗1步）
+                    state['steps_left'] -= 1
                     turn_ended = check_turn_end(room, state) # 调用辅助函数
                     
                     room.set_state(state)
@@ -434,16 +443,16 @@ def handle_move(data):
                         total_cost += cell_cost
                 
                 # 检查是否有足够的步数
-                if state['steps_left'] < total_cost:
-                    emit('error', {'msg': f'步数不足，移动需要 {total_cost} 步'})
+                if state['steps_left'] < 1:
+                    emit('error', {'msg': '步数不足'})
                     return
                 
                 # 执行移动
                 board[tr][tc] = attacker
                 board[fr][fc] = None
                 
-                # 扣除步数并检查回合结束
-                state['steps_left'] -= total_cost
+                # 扣除步数并检查回合结束（每次移动只消耗1步）
+                state['steps_left'] -= 1
                 turn_ended = check_turn_end(room, state) # 调用辅助函数
                 
                 room.set_state(state)
@@ -763,8 +772,13 @@ def resolve_combat(room, state):
 
     # --- 2. 判定胜负 (保持原有逻辑) ---
     
-    # 检查是否是炮攻击地形
-    is_cannon_attack_terrain = attacker_piece['type'] == 'P' and def_info.get('is_terrain')
+    # 检查攻击方是否具有改变地形的能力
+    can_change_terrain = False
+    if 'piece_types' in state and attacker_piece['type'] in state['piece_types']:
+        can_change_terrain = state['piece_types'][attacker_piece['type']].get('terrain_change', False)
+    
+    # 检查是否是可改变地形的棋子攻击地形
+    is_cannon_attack_terrain = can_change_terrain and def_info.get('is_terrain')
     
     if is_cannon_attack_terrain:
         # 炮攻击地形时的处理逻辑
@@ -859,8 +873,8 @@ def resolve_combat(room, state):
                 # 失败方是防守方（target_piece被击败）
                 generate_and_give_recruit_card(room, state, def_info['side'], combat_log)
                 
-                # 炮攻击时降低地形高度
-                if attacker_piece['type'] == 'P' and 'terrain' in state and 'height' in state['terrain']:
+                # 可改变地形的棋子攻击时降低地形高度
+                if can_change_terrain and 'terrain' in state and 'height' in state['terrain']:
                     if 0 <= tr < len(state['terrain']['height']) and 0 <= tc < len(state['terrain']['height'][tr]):
                         current_height = state['terrain']['height'][tr][tc]
                         new_height = max(-1, current_height - 1)
@@ -1430,12 +1444,16 @@ def check_turn_end(room, state):
         # 重置炮的攻击使用状态
         if 'has_used_cannon' in state:
             state['has_used_cannon'] = {}
-        
+
         # 增加回合数
         if 'turn_number' not in state:
             state['turn_number'] = 1
         state['turn_number'] += 1
-        
+
+        # 【关键修复】先保存状态到数据库
+        room.set_state(state)
+        db.session.commit()
+
         return True
     return False
 
@@ -1905,3 +1923,5 @@ def log_combat(room_id, turn_number, atk_info, def_info, combat_log, distance, a
     # 保存到数据库
     db.session.add(combat_log_entry)
     # 注意：这里不提交，由调用方统一提交
+
+

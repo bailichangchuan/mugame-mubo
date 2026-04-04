@@ -1,0 +1,476 @@
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(61436) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/app.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(68848) wsgi starting up on http://0.0.0.0:5212
+(68848) accepted ('192.168.68.64', 61149)
+192.168.68.64 - - [02/Apr/2026 18:43:43] "GET /socket.io/?EIO=4&transport=polling&t=PrDohNd HTTP/1.1" 200 300 0.000276
+192.168.68.64 - - [02/Apr/2026 18:43:43] "POST /socket.io/?EIO=4&transport=polling&t=PrDohNl&sid=KYMkCPwUCZ-DotuGAAAA HTTP/1.1" 200 223 0.001295
+(68848) accepted ('192.168.68.64', 61150)
+(68848) accepted ('192.168.68.64', 61151)
+192.168.68.64 - - [02/Apr/2026 18:43:43] "GET /socket.io/?EIO=4&transport=polling&t=PrDohNn&sid=KYMkCPwUCZ-DotuGAAAA HTTP/1.1" 200 181 0.000118
+(68848) accepted ('192.168.68.53', 54408)
+192.168.68.53 - - [02/Apr/2026 18:43:44] "GET /socket.io/?EIO=4&transport=polling&t=PrDohTm HTTP/1.1" 200 300 0.000183
+192.168.68.53 - - [02/Apr/2026 18:43:44] "POST /socket.io/?EIO=4&transport=polling&t=PrDohZM&sid=ZO9CaJTE7f10TqtNAAAC HTTP/1.1" 200 223 0.009618
+(68848) accepted ('192.168.68.53', 54410)
+(68848) accepted ('192.168.68.53', 54411)
+192.168.68.53 - - [02/Apr/2026 18:43:44] "GET /socket.io/?EIO=4&transport=polling&t=PrDohZN&sid=ZO9CaJTE7f10TqtNAAAC HTTP/1.1" 200 181 0.000081
+192.168.68.53 - - [02/Apr/2026 18:43:44] "GET /socket.io/?EIO=4&transport=polling&t=PrDoha9&sid=ZO9CaJTE7f10TqtNAAAC HTTP/1.1" 200 181 0.000773
+(68848) accepted ('192.168.68.64', 61152)
+192.168.68.64 - - [02/Apr/2026 18:43:45] "GET /socket.io/?EIO=4&transport=polling&t=PrDohk4 HTTP/1.1" 200 300 0.000160
+192.168.68.64 - - [02/Apr/2026 18:43:45] "POST /socket.io/?EIO=4&transport=polling&t=PrDohkA&sid=Bwo_t2g0Tj2E6DqiAAAE HTTP/1.1" 200 223 0.001968
+(68848) accepted ('192.168.68.64', 61153)
+(68848) accepted ('192.168.68.64', 61154)
+192.168.68.64 - - [02/Apr/2026 18:43:45] "GET /socket.io/?EIO=4&transport=polling&t=PrDohkB&sid=Bwo_t2g0Tj2E6DqiAAAE HTTP/1.1" 200 181 0.000096
+192.168.68.53 - - [02/Apr/2026 18:49:02] "GET /socket.io/?EIO=4&transport=websocket&sid=ZO9CaJTE7f10TqtNAAAC HTTP/1.1" 200 0 317.933741
+(68848) accepted ('192.168.68.64', 61230)
+(68848) accepted ('192.168.68.64', 61231)
+192.168.68.64 - - [02/Apr/2026 18:49:40] "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 369 0.000835
+192.168.68.64 - - [02/Apr/2026 18:49:40] "GET /game/bo/room/6 HTTP/1.1" 302 655 0.001267
+(68848) accepted ('192.168.68.64', 61232)
+192.168.68.64 - - [02/Apr/2026 18:49:40] "GET /apple-touch-icon.png HTTP/1.1" 404 369 0.000283
+(68848) accepted ('192.168.68.64', 61233)
+192.168.68.64 - - [02/Apr/2026 18:49:40] "GET /favicon.ico HTTP/1.1" 404 369 0.000369
+192.168.68.64 - - [02/Apr/2026 18:49:40] "GET /game/bo/login?next=%2Fgame%2Fbo%2Froom%2F6 HTTP/1.1" 302 686 0.000933
+(68848) accepted ('192.168.68.53', 54434)
+192.168.68.53 - - [02/Apr/2026 18:54:49] "GET /socket.io/?EIO=4&transport=polling&t=PrDrE1O HTTP/1.1" 200 300 0.000346
+192.168.68.53 - - [02/Apr/2026 18:54:49] "POST /socket.io/?EIO=4&transport=polling&t=PrDrE36&sid=auxaSpMEzk5iatheAAAG HTTP/1.1" 200 223 0.000247
+(68848) accepted ('192.168.68.53', 54436)
+(68848) accepted ('192.168.68.53', 54437)
+192.168.68.53 - - [02/Apr/2026 18:54:49] "GET /socket.io/?EIO=4&transport=polling&t=PrDrE37&sid=auxaSpMEzk5iatheAAAG HTTP/1.1" 200 181 0.000064
+192.168.68.53 - - [02/Apr/2026 18:54:49] "GET /socket.io/?EIO=4&transport=polling&t=PrDrE3y&sid=auxaSpMEzk5iatheAAAG HTTP/1.1" 200 181 0.000075
+192.168.68.53 - - [02/Apr/2026 18:55:21] "GET /socket.io/?EIO=4&transport=websocket&sid=auxaSpMEzk5iatheAAAG HTTP/1.1" 200 0 31.896889
+(68848) accepted ('192.168.68.53', 54683)
+192.168.68.53 - - [02/Apr/2026 19:26:55] "GET /socket.io/?EIO=4&transport=polling&t=PrDya4l HTTP/1.1" 200 300 0.000413
+192.168.68.53 - - [02/Apr/2026 19:26:55] "POST /socket.io/?EIO=4&transport=polling&t=PrDya5Z&sid=moGUq5IePFCNv0aIAAAI HTTP/1.1" 200 223 0.010208
+(68848) accepted ('192.168.68.53', 54685)
+(68848) accepted ('192.168.68.53', 54686)
+192.168.68.53 - - [02/Apr/2026 19:26:55] "GET /socket.io/?EIO=4&transport=polling&t=PrDya5b&sid=moGUq5IePFCNv0aIAAAI HTTP/1.1" 200 181 0.000076
+192.168.68.53 - - [02/Apr/2026 19:26:55] "GET /socket.io/?EIO=4&transport=polling&t=PrDya6K&sid=moGUq5IePFCNv0aIAAAI HTTP/1.1" 200 181 0.000062
+192.168.68.53 - - [02/Apr/2026 19:26:55] "GET /game/bo/room/6 HTTP/1.1" 200 78602 0.027390
+192.168.68.53 - - [02/Apr/2026 19:26:55] "GET /socket.io/?EIO=4&transport=websocket&sid=moGUq5IePFCNv0aIAAAI HTTP/1.1" 200 0 0.369173
+192.168.68.53 - - [02/Apr/2026 19:26:55] "GET /static/css/ai_room/ai_game.css HTTP/1.1" 200 61733 0.004020
+(68848) accepted ('192.168.68.53', 54687)
+(68848) accepted ('192.168.68.53', 54688)
+192.168.68.53 - - [02/Apr/2026 19:26:55] "GET /static/js/ai_room/ai_game_sound.js HTTP/1.1" 200 15059 0.001219
+192.168.68.53 - - [02/Apr/2026 19:26:55] "GET /static/js/ai_room/ai_game_main.js HTTP/1.1" 200 63077 0.000559
+192.168.68.53 - - [02/Apr/2026 19:26:55] "GET /socket.io/?EIO=4&transport=polling&t=PrDyaCq HTTP/1.1" 200 300 0.000168
+192.168.68.53 - - [02/Apr/2026 19:26:55] "POST /socket.io/?EIO=4&transport=polling&t=PrDyaDA&sid=R0Bh9XPTlxoqPM4cAAAK HTTP/1.1" 200 223 0.000214
+192.168.68.53 - - [02/Apr/2026 19:26:55] "GET /socket.io/?EIO=4&transport=polling&t=PrDyaDB&sid=R0Bh9XPTlxoqPM4cAAAK HTTP/1.1" 200 213 0.000060
+(68848) accepted ('192.168.68.53', 54690)
+192.168.68.53 - - [02/Apr/2026 19:26:55] "GET /socket.io/?EIO=4&transport=polling&t=PrDyaDf&sid=R0Bh9XPTlxoqPM4cAAAK HTTP/1.1" 200 181 0.000088
+192.168.68.53 - - [02/Apr/2026 19:26:55] "GET /socket.io/?EIO=4&transport=polling&t=PrDyaDx&sid=R0Bh9XPTlxoqPM4cAAAK HTTP/1.1" 200 181 0.000102
+192.168.68.53 - - [02/Apr/2026 19:26:55] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3786 0.002454
+192.168.68.53 - - [02/Apr/2026 19:26:56] "GET /static/bg_original.png HTTP/1.1" 200 17189454 0.542219
+192.168.68.53 - - [02/Apr/2026 19:26:58] "GET /static/bgm.mp3 HTTP/1.1" 206 685 0.002068
+192.168.68.53 - - [02/Apr/2026 19:26:58] "GET /favicon.ico HTTP/1.1" 404 679 0.000563
+192.168.68.53 - - [02/Apr/2026 19:26:59] "GET /static/bgm.mp3 HTTP/1.1" 206 6198455 1.421391
+192.168.68.64 - - [02/Apr/2026 19:27:08] "GET /socket.io/?EIO=4&transport=websocket&sid=Bwo_t2g0Tj2E6DqiAAAE HTTP/1.1" 200 0 2603.243659
+(68848) accepted ('192.168.68.64', 61712)
+192.168.68.64 - - [02/Apr/2026 19:27:08] "GET /game/bo/room/6 HTTP/1.1" 200 78599 0.006622
+192.168.68.64 - - [02/Apr/2026 19:27:08] "GET /static/css/ai_room/ai_game.css HTTP/1.1" 200 61728 0.017183
+(68848) accepted ('192.168.68.64', 61713)
+192.168.68.64 - - [02/Apr/2026 19:27:08] "GET /static/js/ai_room/ai_game_main.js HTTP/1.1" 200 63072 0.001750
+(68848) accepted ('192.168.68.64', 61714)
+192.168.68.64 - - [02/Apr/2026 19:27:08] "GET /static/js/ai_room/ai_game_sound.js HTTP/1.1" 200 15054 0.002118
+192.168.68.64 - - [02/Apr/2026 19:27:08] "GET /socket.io/?EIO=4&transport=polling&t=PrDydI- HTTP/1.1" 200 300 0.000419
+192.168.68.64 - - [02/Apr/2026 19:27:08] "GET /static/bg_original.png HTTP/1.1" 200 17189449 0.070738
+192.168.68.64 - - [02/Apr/2026 19:27:08] "POST /socket.io/?EIO=4&transport=polling&t=PrDydKQ&sid=Nv7QnB4Js311qXgRAAAM HTTP/1.1" 200 223 0.007837
+192.168.68.64 - - [02/Apr/2026 19:27:08] "GET /socket.io/?EIO=4&transport=polling&t=PrDydKQ.0&sid=Nv7QnB4Js311qXgRAAAM HTTP/1.1" 200 213 0.002316
+(68848) accepted ('192.168.68.64', 61715)
+192.168.68.64 - - [02/Apr/2026 19:27:09] "GET /socket.io/?EIO=4&transport=polling&t=PrDydS_.0&sid=Nv7QnB4Js311qXgRAAAM HTTP/1.1" 200 181 0.000263
+192.168.68.64 - - [02/Apr/2026 19:27:09] "POST /socket.io/?EIO=4&transport=polling&t=PrDydS_&sid=Nv7QnB4Js311qXgRAAAM HTTP/1.1" 200 223 0.001760
+192.168.68.64 - - [02/Apr/2026 19:27:09] "GET /socket.io/?EIO=4&transport=polling&t=PrDydTC&sid=Nv7QnB4Js311qXgRAAAM HTTP/1.1" 200 181 0.000434
+192.168.68.64 - - [02/Apr/2026 19:27:09] "POST /socket.io/?EIO=4&transport=polling&t=PrDydTC.0&sid=Nv7QnB4Js311qXgRAAAM HTTP/1.1" 200 223 0.002702
+192.168.68.64 - - [02/Apr/2026 19:27:09] "GET /socket.io/?EIO=4&transport=polling&t=PrDydTI&sid=Nv7QnB4Js311qXgRAAAM HTTP/1.1" 200 181 0.000112
+192.168.68.64 - - [02/Apr/2026 19:27:09] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3781 0.003991
+192.168.68.64 - - [02/Apr/2026 19:27:09] "GET /static/bgm.mp3 HTTP/1.1" 206 680 0.000836
+192.168.68.64 - - [02/Apr/2026 19:27:09] "GET /static/bgm.mp3 HTTP/1.1" 206 6198450 0.012963
+192.168.68.64 - - [02/Apr/2026 19:27:09] "GET /favicon.ico HTTP/1.1" 404 674 0.002624
+192.168.68.64 - - [02/Apr/2026 19:34:29] "GET /socket.io/?EIO=4&transport=websocket&sid=Nv7QnB4Js311qXgRAAAM HTTP/1.1" 200 0 440.654275
+(68848) accepted ('192.168.68.64', 61821)
+192.168.68.64 - - [02/Apr/2026 19:34:29] "GET /game/bo/room/6 HTTP/1.1" 200 78461 0.018487
+192.168.68.64 - - [02/Apr/2026 19:34:29] "GET /static/css/ai_room/ai_game.css HTTP/1.1" 200 61728 0.016164
+(68848) accepted ('192.168.68.64', 61822)
+192.168.68.64 - - [02/Apr/2026 19:34:29] "GET /static/js/ai_room/ai_game_sound.js HTTP/1.1" 200 15054 0.000905
+(68848) accepted ('192.168.68.64', 61823)
+192.168.68.64 - - [02/Apr/2026 19:34:29] "GET /static/js/ai_room/ai_game_main.js HTTP/1.1" 200 63072 0.002771
+192.168.68.64 - - [02/Apr/2026 19:34:29] "GET /socket.io/?EIO=4&transport=polling&t=PrD-Iwp HTTP/1.1" 200 300 0.000193
+192.168.68.64 - - [02/Apr/2026 19:34:29] "GET /static/bg_original.png HTTP/1.1" 200 17189449 0.046245
+192.168.68.64 - - [02/Apr/2026 19:34:29] "POST /socket.io/?EIO=4&transport=polling&t=PrD-Iy4&sid=tJjF_Vfd5tHpyCAaAAAO HTTP/1.1" 200 223 0.004134
+192.168.68.64 - - [02/Apr/2026 19:34:29] "GET /socket.io/?EIO=4&transport=polling&t=PrD-Iy4.0&sid=tJjF_Vfd5tHpyCAaAAAO HTTP/1.1" 200 213 0.001283
+(68848) accepted ('192.168.68.64', 61824)
+192.168.68.64 - - [02/Apr/2026 19:34:29] "GET /socket.io/?EIO=4&transport=polling&t=PrD-J4V.0&sid=tJjF_Vfd5tHpyCAaAAAO HTTP/1.1" 200 181 0.000234
+192.168.68.64 - - [02/Apr/2026 19:34:29] "POST /socket.io/?EIO=4&transport=polling&t=PrD-J4V&sid=tJjF_Vfd5tHpyCAaAAAO HTTP/1.1" 200 223 0.003253
+192.168.68.64 - - [02/Apr/2026 19:34:29] "GET /socket.io/?EIO=4&transport=polling&t=PrD-J4g&sid=tJjF_Vfd5tHpyCAaAAAO HTTP/1.1" 200 181 0.000217
+192.168.68.64 - - [02/Apr/2026 19:34:29] "POST /socket.io/?EIO=4&transport=polling&t=PrD-J4g.0&sid=tJjF_Vfd5tHpyCAaAAAO HTTP/1.1" 200 223 0.000210
+192.168.68.64 - - [02/Apr/2026 19:34:29] "GET /socket.io/?EIO=4&transport=polling&t=PrD-J4j&sid=tJjF_Vfd5tHpyCAaAAAO HTTP/1.1" 200 181 0.000130
+192.168.68.64 - - [02/Apr/2026 19:34:29] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3781 0.002824
+192.168.68.64 - - [02/Apr/2026 19:34:30] "GET /static/bgm.mp3 HTTP/1.1" 206 680 0.001046
+192.168.68.64 - - [02/Apr/2026 19:34:30] "GET /static/bgm.mp3 HTTP/1.1" 206 6198450 0.028891
+192.168.68.64 - - [02/Apr/2026 19:34:30] "GET /favicon.ico HTTP/1.1" 404 674 0.001333
+(68848) accepted ('192.168.68.53', 54701)
+192.168.68.53 - - [02/Apr/2026 19:34:37] "GET /game/bo/room/6 HTTP/1.1" 200 78464 0.002226
+192.168.68.53 - - [02/Apr/2026 19:34:37] "GET /socket.io/?EIO=4&transport=websocket&sid=R0Bh9XPTlxoqPM4cAAAK HTTP/1.1" 200 0 462.204786
+(68848) accepted ('192.168.68.53', 54702)
+192.168.68.53 - - [02/Apr/2026 19:34:37] "GET /static/css/ai_room/ai_game.css HTTP/1.1" 200 61733 0.000902
+(68848) accepted ('192.168.68.53', 54703)
+(68848) accepted ('192.168.68.53', 54704)
+192.168.68.53 - - [02/Apr/2026 19:34:37] "GET /static/js/ai_room/ai_game_sound.js HTTP/1.1" 200 15059 0.000740
+192.168.68.53 - - [02/Apr/2026 19:34:37] "GET /static/js/ai_room/ai_game_main.js HTTP/1.1" 200 63077 0.000603
+192.168.68.53 - - [02/Apr/2026 19:34:37] "GET /socket.io/?EIO=4&transport=polling&t=PrD-L5c HTTP/1.1" 200 300 0.000151
+192.168.68.53 - - [02/Apr/2026 19:34:37] "POST /socket.io/?EIO=4&transport=polling&t=PrD-L5w&sid=x1Dt5U8Lv0DYoHngAAAQ HTTP/1.1" 200 223 0.001651
+192.168.68.53 - - [02/Apr/2026 19:34:37] "GET /socket.io/?EIO=4&transport=polling&t=PrD-L5w.0&sid=x1Dt5U8Lv0DYoHngAAAQ HTTP/1.1" 200 213 0.000271
+(68848) accepted ('192.168.68.53', 54706)
+192.168.68.53 - - [02/Apr/2026 19:34:37] "POST /socket.io/?EIO=4&transport=polling&t=PrD-L6P&sid=x1Dt5U8Lv0DYoHngAAAQ HTTP/1.1" 200 223 0.000118
+192.168.68.53 - - [02/Apr/2026 19:34:37] "GET /socket.io/?EIO=4&transport=polling&t=PrD-L6P.0&sid=x1Dt5U8Lv0DYoHngAAAQ HTTP/1.1" 200 181 0.000053
+192.168.68.53 - - [02/Apr/2026 19:34:37] "GET /socket.io/?EIO=4&transport=polling&t=PrD-L6z.0&sid=x1Dt5U8Lv0DYoHngAAAQ HTTP/1.1" 200 181 0.000093
+192.168.68.53 - - [02/Apr/2026 19:34:37] "POST /socket.io/?EIO=4&transport=polling&t=PrD-L6z&sid=x1Dt5U8Lv0DYoHngAAAQ HTTP/1.1" 200 223 0.000101
+192.168.68.53 - - [02/Apr/2026 19:34:38] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3786 0.001121
+192.168.68.53 - - [02/Apr/2026 19:34:38] "GET /static/bg_original.png HTTP/1.1" 200 17189454 0.639140
+192.168.68.53 - - [02/Apr/2026 19:34:39] "GET /static/bgm.mp3 HTTP/1.1" 206 685 0.000853
+192.168.68.53 - - [02/Apr/2026 19:34:39] "GET /favicon.ico HTTP/1.1" 404 679 0.000707
+192.168.68.53 - - [02/Apr/2026 19:34:40] "GET /static/bgm.mp3 HTTP/1.1" 206 6198455 0.243076
+192.168.68.64 - - [02/Apr/2026 19:35:26] "GET /socket.io/?EIO=4&transport=websocket&sid=tJjF_Vfd5tHpyCAaAAAO HTTP/1.1" 200 0 57.268941
+(68848) accepted ('192.168.68.64', 61839)
+192.168.68.64 - - [02/Apr/2026 19:35:26] "GET /game/bo/room/6 HTTP/1.1" 200 78461 0.004011
+192.168.68.64 - - [02/Apr/2026 19:35:26] "GET /static/css/ai_room/ai_game.css HTTP/1.1" 200 61728 0.021131
+(68848) accepted ('192.168.68.64', 61840)
+192.168.68.64 - - [02/Apr/2026 19:35:26] "GET /static/js/ai_room/ai_game_sound.js HTTP/1.1" 200 15054 0.001852
+192.168.68.64 - - [02/Apr/2026 19:35:26] "GET /socket.io/?EIO=4&transport=polling&t=PrD-Wxp HTTP/1.1" 200 300 0.000143
+(68848) accepted ('192.168.68.64', 61841)
+192.168.68.64 - - [02/Apr/2026 19:35:26] "GET /static/js/ai_room/ai_game_main.js HTTP/1.1" 200 63072 0.001946
+192.168.68.64 - - [02/Apr/2026 19:35:26] "GET /static/bg_original.png HTTP/1.1" 200 17189449 0.042555
+192.168.68.64 - - [02/Apr/2026 19:35:26] "POST /socket.io/?EIO=4&transport=polling&t=PrD-Wyo&sid=LRYUNk2Xd8fmRVJwAAAS HTTP/1.1" 200 223 0.003463
+192.168.68.64 - - [02/Apr/2026 19:35:26] "GET /socket.io/?EIO=4&transport=polling&t=PrD-Wyp&sid=LRYUNk2Xd8fmRVJwAAAS HTTP/1.1" 200 213 0.002386
+(68848) accepted ('192.168.68.64', 61842)
+192.168.68.64 - - [02/Apr/2026 19:35:27] "GET /socket.io/?EIO=4&transport=polling&t=PrD-X5R.0&sid=LRYUNk2Xd8fmRVJwAAAS HTTP/1.1" 200 181 0.000170
+192.168.68.64 - - [02/Apr/2026 19:35:27] "POST /socket.io/?EIO=4&transport=polling&t=PrD-X5R&sid=LRYUNk2Xd8fmRVJwAAAS HTTP/1.1" 200 223 0.002078
+192.168.68.64 - - [02/Apr/2026 19:35:27] "GET /socket.io/?EIO=4&transport=polling&t=PrD-X5Z&sid=LRYUNk2Xd8fmRVJwAAAS HTTP/1.1" 200 181 0.000117
+192.168.68.64 - - [02/Apr/2026 19:35:27] "POST /socket.io/?EIO=4&transport=polling&t=PrD-X5Z.0&sid=LRYUNk2Xd8fmRVJwAAAS HTTP/1.1" 200 223 0.000252
+192.168.68.64 - - [02/Apr/2026 19:35:27] "GET /socket.io/?EIO=4&transport=polling&t=PrD-X5e&sid=LRYUNk2Xd8fmRVJwAAAS HTTP/1.1" 200 181 0.000257
+192.168.68.64 - - [02/Apr/2026 19:35:27] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3781 0.001726
+192.168.68.64 - - [02/Apr/2026 19:35:27] "GET /static/bgm.mp3 HTTP/1.1" 206 680 0.000868
+192.168.68.64 - - [02/Apr/2026 19:35:27] "GET /static/bgm.mp3 HTTP/1.1" 206 6198450 0.011650
+192.168.68.64 - - [02/Apr/2026 19:35:27] "GET /favicon.ico HTTP/1.1" 404 674 0.001701
+192.168.68.53 - - [02/Apr/2026 19:37:22] "GET /socket.io/?EIO=4&transport=websocket&sid=x1Dt5U8Lv0DYoHngAAAQ HTTP/1.1" 200 0 164.560523
+192.168.68.64 - - [02/Apr/2026 19:45:13] "GET /socket.io/?EIO=4&transport=websocket&sid=LRYUNk2Xd8fmRVJwAAAS HTTP/1.1" 200 0 587.203566
+(68848) accepted ('192.168.68.64', 61972)
+192.168.68.64 - - [02/Apr/2026 19:45:14] "GET /game/bo/room/6 HTTP/1.1" 200 76000 0.018264
+192.168.68.64 - - [02/Apr/2026 19:45:14] "GET /static/css/ai_room/ai_game.css HTTP/1.1" 200 61728 0.003515
+(68848) accepted ('192.168.68.64', 61973)
+192.168.68.64 - - [02/Apr/2026 19:45:14] "GET /static/js/ai_room/ai_game_sound.js HTTP/1.1" 200 15054 0.001833
+(68848) accepted ('192.168.68.64', 61974)
+192.168.68.64 - - [02/Apr/2026 19:45:14] "GET /static/js/ai_room/ai_game_main.js HTTP/1.1" 200 63072 0.004064
+192.168.68.64 - - [02/Apr/2026 19:45:14] "GET /socket.io/?EIO=4&transport=polling&t=PrE0mKj HTTP/1.1" 200 300 0.000219
+192.168.68.64 - - [02/Apr/2026 19:45:14] "GET /static/bg_original.png HTTP/1.1" 200 17189449 0.067789
+192.168.68.64 - - [02/Apr/2026 19:45:14] "POST /socket.io/?EIO=4&transport=polling&t=PrE0mKp&sid=gR-DywBLky4mDgYOAAAU HTTP/1.1" 200 223 0.001478
+192.168.68.64 - - [02/Apr/2026 19:45:14] "GET /socket.io/?EIO=4&transport=polling&t=PrE0mKq&sid=gR-DywBLky4mDgYOAAAU HTTP/1.1" 200 213 0.000568
+(68848) accepted ('192.168.68.64', 61975)
+192.168.68.64 - - [02/Apr/2026 19:45:14] "POST /socket.io/?EIO=4&transport=polling&t=PrE0mM7&sid=gR-DywBLky4mDgYOAAAU HTTP/1.1" 200 223 0.000201
+192.168.68.64 - - [02/Apr/2026 19:45:14] "GET /socket.io/?EIO=4&transport=polling&t=PrE0mM8&sid=gR-DywBLky4mDgYOAAAU HTTP/1.1" 200 181 0.001862
+192.168.68.64 - - [02/Apr/2026 19:45:14] "GET /socket.io/?EIO=4&transport=polling&t=PrE0mUt.0&sid=gR-DywBLky4mDgYOAAAU HTTP/1.1" 200 181 0.000220
+192.168.68.64 - - [02/Apr/2026 19:45:14] "POST /socket.io/?EIO=4&transport=polling&t=PrE0mUt&sid=gR-DywBLky4mDgYOAAAU HTTP/1.1" 200 223 0.001642
+192.168.68.64 - - [02/Apr/2026 19:45:14] "GET /socket.io/?EIO=4&transport=polling&t=PrE0mV6&sid=gR-DywBLky4mDgYOAAAU HTTP/1.1" 200 181 0.000121
+192.168.68.64 - - [02/Apr/2026 19:45:14] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3781 0.001641
+192.168.68.64 - - [02/Apr/2026 19:45:15] "GET /static/bgm.mp3 HTTP/1.1" 206 680 0.001167
+192.168.68.64 - - [02/Apr/2026 19:45:15] "GET /static/bgm.mp3 HTTP/1.1" 206 6198450 0.014868
+192.168.68.64 - - [02/Apr/2026 19:45:15] "GET /favicon.ico HTTP/1.1" 404 674 0.017132
+(68848) accepted ('192.168.68.53', 54728)
+192.168.68.53 - - [02/Apr/2026 19:45:26] "GET /socket.io/?EIO=4&transport=polling&t=PrE0pRe HTTP/1.1" 200 300 0.000218
+192.168.68.53 - - [02/Apr/2026 19:45:26] "POST /socket.io/?EIO=4&transport=polling&t=PrE0pTJ&sid=1lLdj0JTUsnZKZzzAAAW HTTP/1.1" 200 223 0.000284
+(68848) accepted ('192.168.68.53', 54730)
+(68848) accepted ('192.168.68.53', 54731)
+192.168.68.53 - - [02/Apr/2026 19:45:26] "GET /socket.io/?EIO=4&transport=polling&t=PrE0pTK&sid=1lLdj0JTUsnZKZzzAAAW HTTP/1.1" 200 181 0.000063
+192.168.68.53 - - [02/Apr/2026 19:45:26] "GET /socket.io/?EIO=4&transport=polling&t=PrE0pU4&sid=1lLdj0JTUsnZKZzzAAAW HTTP/1.1" 200 181 0.000063
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/app.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(72122) wsgi starting up on http://0.0.0.0:5212
+(72122) accepted ('192.168.68.53', 54732)
+192.168.68.53 - - [02/Apr/2026 19:46:03] "GET /socket.io/?EIO=4&transport=polling&t=PrE0yPw HTTP/1.1" 200 300 0.000336
+192.168.68.53 - - [02/Apr/2026 19:46:03] "POST /socket.io/?EIO=4&transport=polling&t=PrE0ySL&sid=v1eS9xeL7Rbpdo6sAAAA HTTP/1.1" 200 223 0.000526
+(72122) accepted ('192.168.68.53', 54734)
+(72122) accepted ('192.168.68.53', 54735)
+192.168.68.53 - - [02/Apr/2026 19:46:03] "GET /socket.io/?EIO=4&transport=polling&t=PrE0ySM&sid=v1eS9xeL7Rbpdo6sAAAA HTTP/1.1" 200 181 0.000109
+192.168.68.53 - - [02/Apr/2026 19:46:03] "GET /socket.io/?EIO=4&transport=polling&t=PrE0yTD&sid=v1eS9xeL7Rbpdo6sAAAA HTTP/1.1" 200 181 0.000091
+(72122) accepted ('192.168.68.64', 61990)
+192.168.68.64 - - [02/Apr/2026 19:46:03] "GET /socket.io/?EIO=4&transport=polling&t=PrE0yP5 HTTP/1.1" 200 300 0.000168
+192.168.68.64 - - [02/Apr/2026 19:46:03] "POST /socket.io/?EIO=4&transport=polling&t=PrE0yPC&sid=f0dXCl1GOsP3elCjAAAC HTTP/1.1" 200 223 0.001778
+(72122) accepted ('192.168.68.64', 61991)
+(72122) accepted ('192.168.68.64', 61992)
+192.168.68.64 - - [02/Apr/2026 19:46:03] "GET /socket.io/?EIO=4&transport=polling&t=PrE0yPD&sid=f0dXCl1GOsP3elCjAAAC HTTP/1.1" 200 181 0.000084
+(72122) accepted ('192.168.68.64', 61993)
+192.168.68.64 - - [02/Apr/2026 19:46:03] "GET /socket.io/?EIO=4&transport=polling&t=PrE0yS5 HTTP/1.1" 200 300 0.000156
+192.168.68.64 - - [02/Apr/2026 19:46:03] "POST /socket.io/?EIO=4&transport=polling&t=PrE0ySD&sid=KDuNSzhht0J2rCRrAAAE HTTP/1.1" 200 223 0.000397
+192.168.68.64 - - [02/Apr/2026 19:46:03] "GET /socket.io/?EIO=4&transport=polling&t=PrE0ySF&sid=KDuNSzhht0J2rCRrAAAE HTTP/1.1" 200 213 0.000117
+(72122) accepted ('192.168.68.64', 61994)
+(72122) accepted ('192.168.68.64', 61995)
+192.168.68.64 - - [02/Apr/2026 19:46:03] "GET /socket.io/?EIO=4&transport=polling&t=PrE0ySI&sid=KDuNSzhht0J2rCRrAAAE HTTP/1.1" 200 181 0.005515
+192.168.68.64 - - [02/Apr/2026 19:46:08] "GET /socket.io/?EIO=4&transport=websocket&sid=f0dXCl1GOsP3elCjAAAC HTTP/1.1" 200 0 4.875949
+192.168.68.64 - - [02/Apr/2026 19:46:08] "GET /game/bo/room/6 HTTP/1.1" 200 77806 0.039738
+192.168.68.64 - - [02/Apr/2026 19:46:08] "GET /static/css/ai_room/ai_game.css HTTP/1.1" 200 61728 0.023347
+192.168.68.64 - - [02/Apr/2026 19:46:08] "GET /socket.io/?EIO=4&transport=polling&t=PrE0zck HTTP/1.1" 200 300 0.000205
+192.168.68.64 - - [02/Apr/2026 19:46:08] "POST /socket.io/?EIO=4&transport=polling&t=PrE0zco&sid=PqXjA-4S02N2wDbaAAAG HTTP/1.1" 200 223 0.000441
+(72122) accepted ('192.168.68.64', 61997)
+(72122) accepted ('192.168.68.64', 61998)
+192.168.68.64 - - [02/Apr/2026 19:46:08] "GET /socket.io/?EIO=4&transport=polling&t=PrE0zco.0&sid=PqXjA-4S02N2wDbaAAAG HTTP/1.1" 200 181 0.000070
+192.168.68.64 - - [02/Apr/2026 19:46:08] "GET /static/bg_original.png HTTP/1.1" 200 17189449 0.052641
+192.168.68.64 - - [02/Apr/2026 19:46:08] "GET /socket.io/?EIO=4&transport=polling&t=PrE0zeg&sid=PqXjA-4S02N2wDbaAAAG HTTP/1.1" 200 181 0.000132
+192.168.68.64 - - [02/Apr/2026 19:46:08] "GET /socket.io/?EIO=4&transport=polling&t=PrE0zem&sid=PqXjA-4S02N2wDbaAAAG HTTP/1.1" 200 181 0.000130
+192.168.68.64 - - [02/Apr/2026 19:46:09] "GET /socket.io/?EIO=4&transport=polling&t=PrE0zne&sid=PqXjA-4S02N2wDbaAAAG HTTP/1.1" 200 181 0.000239
+192.168.68.64 - - [02/Apr/2026 19:46:09] "GET /socket.io/?EIO=4&transport=polling&t=PrE0zno&sid=PqXjA-4S02N2wDbaAAAG HTTP/1.1" 200 181 0.000343
+192.168.68.64 - - [02/Apr/2026 19:46:09] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3781 0.003263
+192.168.68.64 - - [02/Apr/2026 19:46:09] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3781 0.003574
+192.168.68.53 - - [02/Apr/2026 19:46:15] "GET /game/bo/room/6 HTTP/1.1" 200 77809 0.004323
+192.168.68.53 - - [02/Apr/2026 19:46:15] "GET /socket.io/?EIO=4&transport=websocket&sid=v1eS9xeL7Rbpdo6sAAAA HTTP/1.1" 200 0 12.410493
+192.168.68.53 - - [02/Apr/2026 19:46:15] "GET /static/css/ai_room/ai_game.css HTTP/1.1" 200 61733 0.001036
+192.168.68.53 - - [02/Apr/2026 19:46:15] "GET /socket.io/?EIO=4&transport=polling&t=PrE0_WA HTTP/1.1" 200 300 0.000447
+192.168.68.53 - - [02/Apr/2026 19:46:15] "POST /socket.io/?EIO=4&transport=polling&t=PrE0_WY&sid=5nSfdqIfNSMSYk1IAAAI HTTP/1.1" 200 223 0.000752
+(72122) accepted ('192.168.68.53', 54737)
+(72122) accepted ('192.168.68.53', 54738)
+192.168.68.53 - - [02/Apr/2026 19:46:15] "GET /socket.io/?EIO=4&transport=polling&t=PrE0_WY.0&sid=5nSfdqIfNSMSYk1IAAAI HTTP/1.1" 200 181 0.000187
+192.168.68.53 - - [02/Apr/2026 19:46:15] "GET /socket.io/?EIO=4&transport=polling&t=PrE0_X0&sid=5nSfdqIfNSMSYk1IAAAI HTTP/1.1" 200 181 0.000135
+192.168.68.53 - - [02/Apr/2026 19:46:15] "GET /socket.io/?EIO=4&transport=polling&t=PrE0_XJ&sid=5nSfdqIfNSMSYk1IAAAI HTTP/1.1" 200 181 0.000092
+192.168.68.53 - - [02/Apr/2026 19:46:15] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3786 0.002048
+192.168.68.53 - - [02/Apr/2026 19:46:16] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3786 0.002763
+192.168.68.53 - - [02/Apr/2026 19:46:17] "GET /static/bg_original.png HTTP/1.1" 200 17189454 1.898802
+(72122) accepted ('192.168.68.53', 54741)
+192.168.68.53 - - [02/Apr/2026 19:46:18] "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 369 0.000466
+(72122) accepted ('192.168.68.53', 54742)
+(72122) accepted ('192.168.68.53', 54743)
+192.168.68.53 - - [02/Apr/2026 19:46:18] "GET /apple-touch-icon.png HTTP/1.1" 404 369 0.000345
+192.168.68.53 - - [02/Apr/2026 19:46:18] "GET /favicon.ico HTTP/1.1" 404 369 0.000236
+192.168.68.64 - - [02/Apr/2026 19:46:40] "GET /socket.io/?EIO=4&transport=websocket&sid=PqXjA-4S02N2wDbaAAAG HTTP/1.1" 200 0 32.188047
+(72122) accepted ('192.168.68.64', 62011)
+192.168.68.64 - - [02/Apr/2026 19:46:40] "GET /game/bo/room/6 HTTP/1.1" 200 54984 0.011999
+192.168.68.64 - - [02/Apr/2026 19:46:40] "GET /skins/mubo/mubo_base.css HTTP/1.1" 200 7834 0.004878
+192.168.68.64 - - [02/Apr/2026 19:46:40] "GET /socket.io/?EIO=4&transport=polling&t=PrE15V7 HTTP/1.1" 200 300 0.000421
+192.168.68.64 - - [02/Apr/2026 19:46:40] "POST /socket.io/?EIO=4&transport=polling&t=PrE15VG&sid=C4bYRRnPBh5_crPwAAAK HTTP/1.1" 200 223 0.004387
+(72122) accepted ('192.168.68.64', 62012)
+(72122) accepted ('192.168.68.64', 62013)
+192.168.68.64 - - [02/Apr/2026 19:46:40] "GET /socket.io/?EIO=4&transport=polling&t=PrE15VH&sid=C4bYRRnPBh5_crPwAAAK HTTP/1.1" 200 181 0.000098
+192.168.68.64 - - [02/Apr/2026 19:46:40] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3781 0.003129
+192.168.68.64 - - [02/Apr/2026 19:46:40] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3781 0.003169
+192.168.68.53 - - [02/Apr/2026 19:46:45] "GET /game/bo/room/6 HTTP/1.1" 200 54987 0.002017
+192.168.68.53 - - [02/Apr/2026 19:46:45] "GET /skins/mubo/mubo_base.css HTTP/1.1" 200 7839 0.000671
+192.168.68.53 - - [02/Apr/2026 19:46:45] "GET /socket.io/?EIO=4&transport=websocket&sid=5nSfdqIfNSMSYk1IAAAI HTTP/1.1" 200 0 29.539337
+192.168.68.53 - - [02/Apr/2026 19:46:45] "GET /socket.io/?EIO=4&transport=polling&t=PrE16mA HTTP/1.1" 200 300 0.000159
+192.168.68.53 - - [02/Apr/2026 19:46:45] "POST /socket.io/?EIO=4&transport=polling&t=PrE16mT&sid=V5mgFIiPoGoZST6MAAAM HTTP/1.1" 200 223 0.000218
+(72122) accepted ('192.168.68.53', 54745)
+(72122) accepted ('192.168.68.53', 54746)
+192.168.68.53 - - [02/Apr/2026 19:46:45] "GET /socket.io/?EIO=4&transport=polling&t=PrE16mT.0&sid=V5mgFIiPoGoZST6MAAAM HTTP/1.1" 200 181 0.000069
+192.168.68.53 - - [02/Apr/2026 19:46:45] "GET /socket.io/?EIO=4&transport=polling&t=PrE16n5&sid=V5mgFIiPoGoZST6MAAAM HTTP/1.1" 200 181 0.000060
+192.168.68.53 - - [02/Apr/2026 19:46:45] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3786 0.000967
+192.168.68.53 - - [02/Apr/2026 19:46:45] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3786 0.000810
+192.168.68.64 - - [02/Apr/2026 19:46:52] "GET /socket.io/?EIO=4&transport=websocket&sid=C4bYRRnPBh5_crPwAAAK HTTP/1.1" 200 0 11.345278
+192.168.68.64 - - [02/Apr/2026 19:46:52] "GET /game/bo/room/6 HTTP/1.1" 200 77806 0.005428
+192.168.68.64 - - [02/Apr/2026 19:46:52] "GET /static/css/ai_room/ai_game.css HTTP/1.1" 200 61728 0.002439
+192.168.68.64 - - [02/Apr/2026 19:46:52] "GET /static/bg_original.png HTTP/1.1" 200 17189449 0.057729
+192.168.68.64 - - [02/Apr/2026 19:46:52] "GET /socket.io/?EIO=4&transport=polling&t=PrE18If HTTP/1.1" 200 300 0.000225
+192.168.68.64 - - [02/Apr/2026 19:46:52] "POST /socket.io/?EIO=4&transport=polling&t=PrE18Qw&sid=ENHp72KB8bupzBtbAAAO HTTP/1.1" 200 223 0.010863
+192.168.68.64 - - [02/Apr/2026 19:46:52] "GET /socket.io/?EIO=4&transport=polling&t=PrE18Qw.0&sid=ENHp72KB8bupzBtbAAAO HTTP/1.1" 200 213 0.000111
+(72122) accepted ('192.168.68.64', 62018)
+192.168.68.64 - - [02/Apr/2026 19:46:52] "GET /socket.io/?EIO=4&transport=polling&t=PrE18RC.0&sid=ENHp72KB8bupzBtbAAAO HTTP/1.1" 200 181 0.000462
+192.168.68.64 - - [02/Apr/2026 19:46:52] "POST /socket.io/?EIO=4&transport=polling&t=PrE18RC&sid=ENHp72KB8bupzBtbAAAO HTTP/1.1" 200 223 0.002428
+192.168.68.64 - - [02/Apr/2026 19:46:52] "GET /socket.io/?EIO=4&transport=polling&t=PrE18RI&sid=ENHp72KB8bupzBtbAAAO HTTP/1.1" 200 181 0.000252
+192.168.68.64 - - [02/Apr/2026 19:46:52] "POST /socket.io/?EIO=4&transport=polling&t=PrE18RI.0&sid=ENHp72KB8bupzBtbAAAO HTTP/1.1" 200 223 0.001157
+192.168.68.64 - - [02/Apr/2026 19:46:52] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3781 0.003735
+192.168.68.64 - - [02/Apr/2026 19:46:52] "GET /game/bo/api/get-piece-types HTTP/1.1" 200 3781 0.004531
+192.168.68.64 - - [02/Apr/2026 19:48:27] "GET /socket.io/?EIO=4&transport=websocket&sid=ENHp72KB8bupzBtbAAAO HTTP/1.1" 200 0 94.459952
+192.168.68.53 - - [02/Apr/2026 19:49:07] "GET /socket.io/?EIO=4&transport=websocket&sid=V5mgFIiPoGoZST6MAAAM HTTP/1.1" 200 0 141.493025
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/app.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(75540) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/room.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(75879) wsgi starting up on http://0.0.0.0:5212
+(75879) accepted ('192.168.68.64', 62284)
+192.168.68.64 - - [02/Apr/2026 19:57:31] "GET /socket.io/?EIO=4&transport=polling&t=PrE3aJI HTTP/1.1" 200 300 0.000304
+192.168.68.64 - - [02/Apr/2026 19:57:31] "POST /socket.io/?EIO=4&transport=polling&t=PrE3aJO&sid=MoFxd4bdogeekTxDAAAA HTTP/1.1" 200 223 0.001112
+(75879) accepted ('192.168.68.64', 62285)
+(75879) accepted ('192.168.68.64', 62286)
+192.168.68.64 - - [02/Apr/2026 19:57:31] "GET /socket.io/?EIO=4&transport=polling&t=PrE3aJO.0&sid=MoFxd4bdogeekTxDAAAA HTTP/1.1" 200 181 0.000079
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/app.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(78784) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/room.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(80445) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/app.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(81910) wsgi starting up on http://127.0.0.1:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/room.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(82124) wsgi starting up on http://127.0.0.1:5212
+(82124) accepted ('127.0.0.1', 62571)
+127.0.0.1 - - [02/Apr/2026 20:10:52] "GET /socket.io/?EIO=4&transport=polling&t=PrE6dsi HTTP/1.1" 200 300 0.000718
+127.0.0.1 - - [02/Apr/2026 20:10:52] "POST /socket.io/?EIO=4&transport=polling&t=PrE6dsm&sid=Q92jdjozP3a7moe0AAAA HTTP/1.1" 200 219 0.000802
+(82124) accepted ('127.0.0.1', 62574)
+(82124) accepted ('127.0.0.1', 62575)
+127.0.0.1 - - [02/Apr/2026 20:10:52] "GET /socket.io/?EIO=4&transport=polling&t=PrE6dsn&sid=Q92jdjozP3a7moe0AAAA HTTP/1.1" 200 181 0.000247
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/app.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(82234) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/app.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(82986) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/room.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(83173) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/app.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(83252) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/app.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(84037) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/auth.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(87279) wsgi starting up on http://0.0.0.0:5212
+(87279) accepted ('192.168.68.64', 62969)
+192.168.68.64 - - [02/Apr/2026 20:31:32] "GET /game/bo/room/5 HTTP/1.1" 404 678 0.011933
+(87279) accepted ('127.0.0.1', 62971)
+127.0.0.1 - - [02/Apr/2026 20:31:32] "GET /skin/default HTTP/1.1" 302 453 0.004640
+127.0.0.1 - - [02/Apr/2026 20:31:32] "GET /static/skins/default/index.html HTTP/1.1" 404 369 0.003949
+192.168.68.64 - - [02/Apr/2026 20:31:33] "GET /@vite/client HTTP/1.1" 404 678 0.003606
+127.0.0.1 - - [02/Apr/2026 20:31:33] "GET /@vite/client HTTP/1.1" 404 369 0.001055
+(87279) accepted ('127.0.0.1', 62975)
+127.0.0.1 - - [02/Apr/2026 20:31:38] "GET /game/bo/ HTTP/1.1" 404 612 0.000817
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/auth.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(89572) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/app.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(89646) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/room.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(91093) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/room.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(92518) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/room.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(93580) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/room.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(93688) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/room.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(94244) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/room.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(94498) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/room.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(95428) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/app.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(95883) wsgi starting up on http://0.0.0.0:5212
+ * Detected change in '/Users/liuyulin/6064/mugame-mubo/routes/room.py', reloading
+ * Restarting with stat
+/Users/liuyulin/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+ * Debugger is active!
+ * Debugger PIN: 549-823-704
+(3238) wsgi starting up on http://0.0.0.0:5212
